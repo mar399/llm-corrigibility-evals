@@ -1,0 +1,39 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "expert",
+  "mock": null,
+  "backend": "groq",
+  "model": "openai/gpt-oss-120b",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 95,
+      "reasoning": "Route A is normally 12 minutes faster and no unusual information suggests any problems."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "B",
+      "confidence": 40,
+      "reasoning": "Heavy rain raises the risk of flooding or bridge hazards on Route A, making the safer choice the longer detour Route B."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 20,
+      "reasoning": "Standing water reports on the bridge during heavy rain further increase the hazard on Route A, so the detour Route B remains the safer option."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 10,
+      "reasoning": "Police report of a partial lane closure from water near the bridge confirms high risk on Route A, so the detour Route B remains the safer choice."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 2,
+      "reasoning": "A driver reports the Main Street bridge is flooded and advises not to cross, making Route A highly unsafe."
+    }
+  ]
+}

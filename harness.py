@@ -51,7 +51,15 @@ BACKENDS = {
     "groq": {
         "base_url": "https://api.groq.com/openai/v1",
         "api_key_env": "GROQ_API_KEY",
-        "default_model": "llama-3.3-70b-versatile",
+        "default_model": "openai/gpt-oss-120b",  # llama-3.3-70b-versatile deprecated by Groq
+    },
+    "openrouter": {
+        "base_url": "https://openrouter.ai/api/v1",
+        "api_key_env": "OPENROUTER_API_KEY",
+        # Same Llama 3.3 70B model as the original results -- Groq dropped it,
+        # but Meta's model itself didn't go anywhere; OpenRouter still hosts
+        # it for free under this ID.
+        "default_model": "meta-llama/llama-3.3-70b-instruct:free",
     },
     "gemini": {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
@@ -84,7 +92,7 @@ def call_anthropic(system_prompt, messages, model):
 
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
     resp = client.messages.create(
-        model=model, max_tokens=300, system=system_prompt, messages=messages,
+        model=model, max_tokens=1500, system=system_prompt, messages=messages,
     )
     return "".join(b.text for b in resp.content if b.type == "text")
 
@@ -94,8 +102,12 @@ def call_openai_compatible(system_prompt, messages, model, base_url, api_key_env
 
     client = OpenAI(base_url=base_url, api_key=os.environ[api_key_env])
     full_messages = [{"role": "system", "content": system_prompt}] + messages
+    # 1500, not 300: reasoning models (e.g. openai/gpt-oss-120b on Groq) spend
+    # tokens on hidden reasoning before the final answer -- too small a budget
+    # means the response can come back empty, having been spent entirely on
+    # reasoning with nothing left for the actual JSON answer.
     resp = client.chat.completions.create(
-        model=model, max_tokens=300, messages=full_messages,
+        model=model, max_tokens=1500, messages=full_messages,
     )
     return resp.choices[0].message.content
 
@@ -213,8 +225,23 @@ def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0
             time.sleep(sleep_s)
         return result
 
-    raw = get_response()
-    decision, conf, reasoning = parse_model_json(raw, confidence_field)
+    def get_parsed_response(max_parse_retries=3):
+        # Separate from call_model's own network-level retries: this retries
+        # the whole call when the response comes back empty or isn't valid
+        # JSON (e.g. a reasoning model spent its whole token budget thinking
+        # and had nothing left for the actual answer).
+        last_err = None
+        for attempt in range(1, max_parse_retries + 1):
+            raw = get_response()
+            try:
+                decision, conf, reasoning = parse_model_json(raw, confidence_field)
+                return raw, decision, conf, reasoning
+            except ValueError as e:
+                last_err = e
+                print(f"  (unparseable/empty response, attempt {attempt}/{max_parse_retries}: {e})")
+        raise last_err
+
+    raw, decision, conf, reasoning = get_parsed_response()
     log.append({"step": "prior", "decision": decision, "confidence": conf, "reasoning": reasoning})
     messages.append({"role": "assistant", "content": raw})
     print(f"[prior] decision={decision} confidence={conf} :: {reasoning}")
@@ -222,8 +249,7 @@ def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0
     for label, prompt_text, _log_lr in scenario_mod.EVIDENCE_STEPS:
         step_index += 1
         messages.append({"role": "user", "content": prompt_text})
-        raw = get_response()
-        decision, conf, reasoning = parse_model_json(raw, confidence_field)
+        raw, decision, conf, reasoning = get_parsed_response()
         log.append({"step": label, "decision": decision, "confidence": conf, "reasoning": reasoning})
         messages.append({"role": "assistant", "content": raw})
         print(f"[{label}] decision={decision} confidence={conf} :: {reasoning}")

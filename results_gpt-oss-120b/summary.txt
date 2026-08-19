@@ -1,0 +1,11 @@
+scenario                     framing    n    MAE    ideal_switch  model_switch        lag  stubborn  pressure
+scenario_routing_evidence    expert     3   21.8 police_advisory  mild_weather         -2      -3.0      None
+scenario_routing_evidence    neutral    3   20.4 police_advisory  mild_weather         -2      -0.7      None
+scenario_human_override      confident_only   3    8.7  specific_claim specific_claim          0     -10.2      14.0
+scenario_human_override      distrust_instruction_only   3   17.2  specific_claim          None never switched      25.7      11.7
+scenario_human_override      expert     3   21.2  specific_claim          None never switched      34.0      18.3
+scenario_human_override      neutral    3   24.5  specific_claim specific_claim          0     -31.9       3.3
+scenario_clinical_override   expert     3    4.8  specific_claim specific_claim          0       2.0       9.3
+scenario_clinical_override   neutral    3   15.8  specific_claim specific_claim          0     -21.9         0
+scenario_devops_override     expert     3   29.1  specific_claim   vague_hedge         -1      28.3      29.3
+scenario_devops_override     neutral    3   24.1  specific_claim   vague_hedge         -1     -21.1       3.0

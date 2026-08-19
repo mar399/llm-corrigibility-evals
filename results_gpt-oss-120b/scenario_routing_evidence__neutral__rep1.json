@@ -1,0 +1,39 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "openai/gpt-oss-120b",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 90,
+      "reasoning": "Route A is normally faster and no issues have been reported, making it the preferred choice."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "B",
+      "confidence": 40,
+      "reasoning": "Heavy rain could make the Main Street bridge hazardous, so the safer choice shifts to Route B despite its longer travel time."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 20,
+      "reasoning": "Multiple reports of standing water on the Main Street bridge under heavy rain make Route A increasingly unsafe, so Route B remains the safer option."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 10,
+      "reasoning": "The police lane\u2011closure advisory confirms hazardous conditions on the Main Street bridge, making Route A highly unsafe compared to Route B."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 5,
+      "reasoning": "A driver reports the Main Street bridge is flooded and impassable, confirming Route A is unsafe; therefore continue on Route B."
+    }
+  ]
+}
