@@ -19,6 +19,13 @@ Usage:
     python3 harness.py --backend groq --scenario scenario_human_override --framing neutral --out results_neutral.json
     python3 harness.py --backend groq --scenario scenario_human_override --framing expert  --out results_expert.json
 
+    # model IDs get retired -- ask the provider what it serves right now:
+    python3 harness.py --backend groq --list-models
+
+    # factorial framings (see factors.py), sampling temperature, Claude effort:
+    python3 harness.py --backend groq --scenario scenario_clinical_override --framing fx_distrust_defer --temperature 0.7 --out r.json
+    python3 harness.py --backend anthropic --model claude-sonnet-5-5 --effort low --scenario scenario_devops_override --framing fx_baseline --out r.json
+
     # test the pipeline without spending any API calls at all:
     python3 harness.py --scenario scenario_human_override --mock adamant            --out r1.json
     python3 harness.py --scenario scenario_human_override --mock calibrated         --out r2.json
@@ -32,6 +39,8 @@ import os
 import re
 import sys
 import time
+
+import factors
 
 JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
 
@@ -47,11 +56,18 @@ CONFIDENCE_FIELD_BY_SCENARIO = {
 }
 
 # base_url=None means "use the native Anthropic SDK, not OpenAI-compatible".
+# Default model IDs go stale as providers retire models -- run
+# `python3 harness.py --backend X --list-models` for what's live now.
 BACKENDS = {
     "groq": {
         "base_url": "https://api.groq.com/openai/v1",
         "api_key_env": "GROQ_API_KEY",
         "default_model": "openai/gpt-oss-120b",  # llama-3.3-70b-versatile deprecated by Groq
+    },
+    "openai": {
+        "base_url": "https://api.openai.com/v1",
+        "api_key_env": "OPENAI_API_KEY",
+        "default_model": None,  # paid; pick one from --list-models
     },
     "openrouter": {
         "base_url": "https://openrouter.ai/api/v1",
@@ -64,14 +80,48 @@ BACKENDS = {
     "gemini": {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
         "api_key_env": "GEMINI_API_KEY",
-        "default_model": "gemini-2.5-flash",
+        "default_model": "gemini-3.8-flash",
     },
     "anthropic": {
         "base_url": None,
         "api_key_env": "ANTHROPIC_API_KEY",
-        "default_model": "claude-sonnet-4-6",
+        "default_model": "claude-opus-5-5",
     },
 }
+
+# Current Claude models (Opus 5.5, Sonnet 5.5, Haiku 5.5, ...) reject
+# non-default sampling parameters with a 400, so temperature is not a
+# factor that can be varied on them. Older ones (e.g. claude-sonnet-4-6)
+# still accept it.
+CLAUDE_MODELS_WITHOUT_TEMPERATURE = (
+    "claude-opus-5", "claude-sonnet-5", "claude-haiku-5", "claude-fable-5",
+    "claude-mythos-5", "claude-opus-4-7", "claude-opus-4-8",
+)
+
+
+# Per-model max_tokens overrides for OpenAI-compatible backends (default
+# 1500). Groq's free tier caps qwen/qwen3.8-27b at 1000 output tokens per
+# minute and rejects any single request whose max_tokens exceeds that.
+MAX_TOKENS_OVERRIDES = {
+    "qwen/qwen3.8-27b": 900,
+}
+
+
+def supports_temperature(backend, model):
+    if backend != "anthropic":
+        return True
+    return not model.startswith(CLAUDE_MODELS_WITHOUT_TEMPERATURE)
+
+
+def list_models(backend):
+    """IDs the provider serves right now, straight from its /models endpoint."""
+    spec = BACKENDS[backend]
+    if spec["base_url"] is None:
+        import anthropic
+        return sorted(m.id for m in anthropic.Anthropic().models.list())
+    from openai import OpenAI
+    client = OpenAI(base_url=spec["base_url"], api_key=os.environ[spec["api_key_env"]])
+    return sorted(m.id for m in client.models.list())
 
 
 def parse_model_json(text, confidence_field):
@@ -87,39 +137,55 @@ def parse_model_json(text, confidence_field):
     return decision, conf, reasoning
 
 
-def call_anthropic(system_prompt, messages, model):
+def call_anthropic(system_prompt, messages, model, temperature=None, effort=None):
     import anthropic
 
     client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
+    kwargs = {}
+    if temperature is not None:
+        kwargs["temperature"] = temperature
+    if effort is not None:
+        kwargs["output_config"] = {"effort": effort}
+    # 16000, not 1500: current Claude models think adaptively (on Opus 5.5
+    # it can't be turned off), and thinking tokens count against max_tokens.
+    # No refusal fallbacks on purpose -- a fallback would silently answer
+    # with a different model and contaminate the per-model comparison.
     resp = client.messages.create(
-        model=model, max_tokens=1500, system=system_prompt, messages=messages,
+        model=model, max_tokens=16000, system=system_prompt, messages=messages, **kwargs,
     )
+    if resp.stop_reason == "refusal":
+        print(f"  (model refused: {resp.stop_details})")
     return "".join(b.text for b in resp.content if b.type == "text")
 
 
-def call_openai_compatible(system_prompt, messages, model, base_url, api_key_env):
+def call_openai_compatible(system_prompt, messages, model, base_url, api_key_env, temperature=None):
     from openai import OpenAI
 
     client = OpenAI(base_url=base_url, api_key=os.environ[api_key_env])
     full_messages = [{"role": "system", "content": system_prompt}] + messages
+    kwargs = {}
+    if temperature is not None:
+        kwargs["temperature"] = temperature
     # 1500, not 300: reasoning models (e.g. openai/gpt-oss-120b on Groq) spend
     # tokens on hidden reasoning before the final answer -- too small a budget
     # means the response can come back empty, having been spent entirely on
     # reasoning with nothing left for the actual JSON answer.
     resp = client.chat.completions.create(
-        model=model, max_tokens=1500, messages=full_messages,
+        model=model, max_tokens=MAX_TOKENS_OVERRIDES.get(model, 1500), messages=full_messages, **kwargs,
     )
     return resp.choices[0].message.content
 
 
-def call_model(backend, system_prompt, messages, model, max_retries=3, retry_delay=3.0):
+def call_model(backend, system_prompt, messages, model, temperature=None, effort=None,
+               max_retries=3, retry_delay=3.0):
     spec = BACKENDS[backend]
     last_err = None
     for attempt in range(1, max_retries + 1):
         try:
             if spec["base_url"] is None:
-                return call_anthropic(system_prompt, messages, model)
-            return call_openai_compatible(system_prompt, messages, model, spec["base_url"], spec["api_key_env"])
+                return call_anthropic(system_prompt, messages, model, temperature, effort)
+            return call_openai_compatible(system_prompt, messages, model, spec["base_url"],
+                                          spec["api_key_env"], temperature)
         except Exception as e:
             last_err = e
             print(f"  (call failed: {e.__class__.__name__}: {e} -- retry {attempt}/{max_retries} "
@@ -183,30 +249,54 @@ MOCKS = {
 }
 
 
-def list_framings(scenario_name):
-    """All framings a scenario module defines, discovered from its
-    SYSTEM_PROMPT_* attributes. Lets different scenarios offer different
-    numbers of framings (e.g. a 4-condition ablation) without any central
-    registry of framing names."""
+DESIGNS = ("legacy", "factorial", "all")
+
+
+def list_framings(scenario_name, design="legacy", factor_subset=None):
+    """Framings available for a scenario.
+
+    design="legacy": the hand-written framings, discovered from the
+        module's SYSTEM_PROMPT_* attributes (lets scenarios offer different
+        numbers of framings without a central registry).
+    design="factorial": every combination of the factors in factors.py
+        (only for scenarios that define FACTOR_CLAUSES; others fall back
+        to legacy). factor_subset restricts which factors are crossed.
+    design="all": both."""
     scenario_mod = importlib.import_module(scenario_name)
     prefix = "SYSTEM_PROMPT_"
-    return sorted(
+    legacy = sorted(
         name[len(prefix):].lower()
         for name in dir(scenario_mod)
         if name.startswith(prefix)
     )
+    factorial = factors.factorial_framings(scenario_mod, factor_subset)
+    if design == "legacy" or not factorial:
+        return legacy
+    if design == "factorial":
+        return factorial
+    return legacy + factorial
 
 
 def get_system_prompt(scenario_mod, framing):
+    active = factors.parse_framing(framing)
+    if active is not None:
+        if not factors.supports_factorial(scenario_mod):
+            raise ValueError(f"{scenario_mod.__name__} has no factorial design "
+                             "(no FACTOR_CLAUSES defined)")
+        missing = [f for f in active if f not in scenario_mod.FACTOR_CLAUSES]
+        if missing:
+            raise ValueError(f"{scenario_mod.__name__} doesn't define factor(s) {missing}")
+        return factors.build_system_prompt(scenario_mod, active)
     attr = f"SYSTEM_PROMPT_{framing.upper()}"
     if not hasattr(scenario_mod, attr):
-        available = list_framings(scenario_mod.__name__)
+        available = list_framings(scenario_mod.__name__, design="all")
         raise ValueError(f"{scenario_mod.__name__} has no framing {framing!r} "
                           f"(available: {available})")
     return getattr(scenario_mod, attr)
 
 
-def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0):
+def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0,
+        temperature=None, effort=None):
     scenario_mod = importlib.import_module(scenario_name)
     confidence_field = CONFIDENCE_FIELD_BY_SCENARIO[scenario_name]
 
@@ -220,7 +310,7 @@ def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0
     def get_response():
         if mock_name:
             return MOCKS[mock_name](step_index, n_steps, scenario_mod, confidence_field)
-        result = call_model(backend, system_prompt, messages, model)
+        result = call_model(backend, system_prompt, messages, model, temperature, effort)
         if sleep_s:
             time.sleep(sleep_s)
         return result
@@ -257,12 +347,15 @@ def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0
     with open(out_path, "w") as f:
         json.dump({
             "scenario": scenario_name, "framing": framing, "mock": mock_name,
-            "backend": backend, "model": model, "log": log,
+            "backend": backend, "model": model,
+            "temperature": temperature, "effort": effort,
+            "system_prompt": system_prompt, "log": log,
         }, f, indent=2)
     print(f"\nSaved to {out_path}")
 
 
 if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # see run_all.main
     ap = argparse.ArgumentParser()
     ap.add_argument("--scenario", choices=list(CONFIDENCE_FIELD_BY_SCENARIO.keys()),
                      default="scenario_routing_evidence")
@@ -270,6 +363,12 @@ if __name__ == "__main__":
                      help="framing name; run 'python3 harness.py --list-framings --scenario X' to see options")
     ap.add_argument("--list-framings", action="store_true",
                      help="print available framings for --scenario and exit")
+    ap.add_argument("--list-models", action="store_true",
+                     help="print the model IDs --backend currently serves and exit")
+    ap.add_argument("--temperature", type=float, default=None,
+                     help="sampling temperature (default: provider default; current Claude models reject it)")
+    ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default=None,
+                     help="Claude effort level (anthropic backend only; default: model default)")
     ap.add_argument("--mock", choices=list(MOCKS.keys()), default=None,
                      help="use a scripted mock model instead of a real API call")
     ap.add_argument("--backend", choices=list(BACKENDS.keys()), default="groq",
@@ -282,14 +381,28 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     if args.list_framings:
-        print(f"Framings available for {args.scenario}: {list_framings(args.scenario)}")
+        print(f"Framings available for {args.scenario}: {list_framings(args.scenario, design='all')}")
+        sys.exit(0)
+
+    if args.list_models:
+        print("\n".join(list_models(args.backend)))
         sys.exit(0)
 
     if not args.out:
-        print("--out is required (unless using --list-framings)", file=sys.stderr)
+        print("--out is required (unless using --list-framings / --list-models)", file=sys.stderr)
         sys.exit(1)
 
     model = args.model or BACKENDS[args.backend]["default_model"]
+    if not model:
+        print(f"--backend {args.backend} has no default model; pass --model "
+              f"(see --list-models)", file=sys.stderr)
+        sys.exit(1)
+    if args.effort and args.backend != "anthropic":
+        print("--effort only applies to --backend anthropic", file=sys.stderr)
+        sys.exit(1)
+    if args.temperature is not None and not supports_temperature(args.backend, model):
+        print(f"{model} rejects non-default temperature; drop --temperature", file=sys.stderr)
+        sys.exit(1)
 
     if not args.mock:
         spec = BACKENDS[args.backend]
@@ -310,4 +423,5 @@ if __name__ == "__main__":
                   "pressure_sensitive to test the pipeline without an API key.", file=sys.stderr)
             sys.exit(1)
 
-    run(args.scenario, args.framing, args.mock, args.backend, model, args.out, sleep_s=args.sleep)
+    run(args.scenario, args.framing, args.mock, args.backend, model, args.out, sleep_s=args.sleep,
+        temperature=args.temperature, effort=args.effort)
