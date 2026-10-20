@@ -531,6 +531,12 @@ as permitted after the pre-registration was published.
 - **Added (exploratory):** each main effect is also estimated separately
   for each wording (`analyze_factors.py --by-wording`), to report whether
   its sign holds under every phrasing.
+- **MiniMax gets the same wording replicates.** Its completed design
+  (wording 1, 3 identical repeats) is analyzed as pre-registered and
+  stands as reported. Wordings 2 and 3 are added (1 run each, same
+  distrust x defer cells, 24 runs), so its wording robustness can be
+  checked within the model the same way as the Groq models'. That
+  check uses wording 1 repeat 1 plus wordings 2 and 3.
 
 ## References
 
