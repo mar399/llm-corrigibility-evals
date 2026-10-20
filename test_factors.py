@@ -54,6 +54,27 @@ def test_paraphrase_wordings():
         assert len({harness.get_system_prompt(mod, "fx_baseline", w) for w in (1, 2, 3)}) == 1
 
 
+def test_two_by_two_cells():
+    assert factors.parse_framing("fx_distrust_recbad") == ("distrust", "recbad")
+    assert factors.record_of(("distrust", "recbad")) == "bad"
+    assert factors.record_of(("distrust",)) is None
+    for name in OVERRIDE_SCENARIOS:
+        mod = importlib.import_module(name)
+        assert harness.list_framings(name, "2x2") == list(factors.TWO_BY_TWO)
+        # track record changes only the opening message, distrust only the system prompt
+        assert harness.get_system_prompt(mod, "fx_recgood") == mod.SYSTEM_PROMPT_NEUTRAL
+        assert harness.get_system_prompt(mod, "fx_distrust_recbad") == harness.get_system_prompt(mod, "fx_distrust")
+        for w in (1, 2, 3):
+            good = factors.initial_prompt(mod, ("recgood",), w)
+            bad = factors.initial_prompt(mod, ("recbad",), w)
+            assert good.endswith(mod.INITIAL_PROMPT) and bad.endswith(mod.INITIAL_PROMPT) and good != bad
+        assert factors.initial_prompt(mod, ("distrust",)) == mod.INITIAL_PROMPT
+        # record-free ideal unchanged; a good record makes the ideal stop sooner than a bad one
+        assert mod.ideal_trajectory() == mod.ideal_trajectory(None)
+        assert mod.ideal_trajectory("good")[-1][1] < mod.ideal_trajectory()[-1][1] < mod.ideal_trajectory("bad")[-1][1]
+    assert harness.list_framings("scenario_routing_evidence", "2x2") == []
+
+
 if __name__ == "__main__":
     for fn_name, fn in list(globals().items()):
         if fn_name.startswith("test_"):

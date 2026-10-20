@@ -33,31 +33,58 @@ import itertools
 FACTOR_ORDER = ("confident", "distrust", "defer")
 PREFIX = "fx_"
 
+# The human's track record (2x2 study) is not a system-prompt clause: it is
+# stated at the start of the opening user message (TRACK_RECORD in each
+# override scenario). It appears in framing names as a final token,
+# e.g. "fx_distrust_recbad".
+RECORD_TOKENS = {"recgood": "good", "recbad": "bad"}
+
+# The reviewer-requested 2x2: distrust instruction (off/on) x track record (good/bad).
+TWO_BY_TWO = ("fx_recgood", "fx_recbad", "fx_distrust_recgood", "fx_distrust_recbad")
+
 
 def supports_factorial(scenario_mod):
     return hasattr(scenario_mod, "FACTOR_CLAUSES")
 
 
 def framing_name(active):
-    active = [f for f in FACTOR_ORDER if f in active]
+    active = [f for f in FACTOR_ORDER if f in active] + [t for t in RECORD_TOKENS if t in active]
     return PREFIX + ("_".join(active) if active else "baseline")
 
 
 def parse_framing(name):
-    """'fx_confident_defer' -> ('confident', 'defer'); None if not factorial."""
+    """'fx_confident_defer' -> ('confident', 'defer'); None if not factorial.
+    A track-record token, if any, comes last: 'fx_distrust_recbad'."""
     if not name.startswith(PREFIX):
         return None
     body = name[len(PREFIX):]
     if body == "baseline":
         return ()
     parts = tuple(body.split("_"))
-    unknown = [p for p in parts if p not in FACTOR_ORDER]
+    unknown = [p for p in parts if p not in FACTOR_ORDER and p not in RECORD_TOKENS]
     if unknown:
         raise ValueError(f"unknown factor(s) {unknown} in framing {name!r}; "
-                         f"known factors: {list(FACTOR_ORDER)}")
-    if list(parts) != [f for f in FACTOR_ORDER if f in parts]:
-        raise ValueError(f"factors in {name!r} must be in canonical order {list(FACTOR_ORDER)}")
-    return parts
+                         f"known: {list(FACTOR_ORDER) + list(RECORD_TOKENS)}")
+    clauses = [p for p in parts if p in FACTOR_ORDER]
+    records = [p for p in parts if p in RECORD_TOKENS]
+    if list(parts) != [f for f in FACTOR_ORDER if f in parts] + records or len(records) > 1:
+        raise ValueError(f"factors in {name!r} must be in canonical order {list(FACTOR_ORDER)}, "
+                         "followed by at most one track-record token")
+    return tuple(clauses) + tuple(records)
+
+
+def record_of(active):
+    """'good', 'bad', or None (no track record stated)."""
+    return next((RECORD_TOKENS[t] for t in active if t in RECORD_TOKENS), None)
+
+
+def initial_prompt(scenario_mod, active, wording=1):
+    record = record_of(active)
+    if record is None:
+        return scenario_mod.INITIAL_PROMPT
+    if not hasattr(scenario_mod, "TRACK_RECORD"):
+        raise ValueError(f"{scenario_mod.__name__} defines no TRACK_RECORD")
+    return scenario_mod.TRACK_RECORD[record][wording - 1] + " " + scenario_mod.INITIAL_PROMPT
 
 
 def factorial_framings(scenario_mod, factors=None):
@@ -93,5 +120,5 @@ def build_system_prompt(scenario_mod, active, wording=1):
     """All active clauses use the same wording index, so a run is one
     coherent phrasing. fx_baseline has no clauses, so it is identical
     across wordings (its replicates are plain repeats)."""
-    clauses = [clause(scenario_mod, f, wording) for f in FACTOR_ORDER if f in active]
+    clauses = [clause(scenario_mod, f, wording) for f in FACTOR_ORDER if f in active]  # record tokens skipped
     return " ".join([scenario_mod.ROLE, *clauses, scenario_mod.TASK_AND_FORMAT])

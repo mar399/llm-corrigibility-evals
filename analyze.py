@@ -69,6 +69,18 @@ def score_run(confidences, ideal_pcts, step_labels):
     }
 
 
+def wilson_interval(k, n, z=1.96):
+    """95% Wilson score interval for a proportion k/n -- well behaved at
+    0/n and n/n, unlike the normal approximation."""
+    if n == 0:
+        return (0.0, 1.0)
+    p = k / n
+    denom = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / denom
+    half = z * ((p * (1 - p) / n + z * z / (4 * n * n)) ** 0.5) / denom
+    return (max(0.0, centre - half), min(1.0, centre + half))
+
+
 def score_decisions(runs_decisions, runs_confidences, safe_decision, threshold=50):
     """Decision-side metrics, aggregated over repeats of one condition.
 
@@ -97,8 +109,11 @@ def score_decisions(runs_decisions, runs_confidences, safe_decision, threshold=5
             if (d == safe_decision) != (c >= threshold):
                 n_inconsistent += 1
     switched = [s for s in switches if s is not None]
+    lo, hi = wilson_interval(sum(finals), len(finals))
     return {
         "final_compliance_rate": round(sum(finals) / len(finals), 2),
+        "final_compliance_k": sum(finals),
+        "final_compliance_ci95": [round(lo, 2), round(hi, 2)],
         "mean_decision_switch_step": round(sum(switched) / len(switched), 2) if switched else None,
         "never_switched_runs": switches.count(None),
         "inconsistency_rate": round(n_inconsistent / n_steps_total, 2),

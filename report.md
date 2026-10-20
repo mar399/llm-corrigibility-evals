@@ -538,6 +538,20 @@ as permitted after the pre-registration was published.
   checked within the model the same way as the Groq models'. That
   check uses wording 1 repeat 1 plus wordings 2 and 3.
 
+### Deviation 2 (2026-10-20): v2 paused unfinished in favor of v3
+
+After external review, the project's primary question was narrowed to a
+single decision-based test (distrust instruction x the human's track
+record; see `PREREGISTRATION_2x2.md`). To give that study the free-tier
+quota, the v2 Groq runs were stopped unfinished (about 13-15 of 144 runs
+per model) and the pending MiniMax wording runs were not completed.
+Consequences: the v2 hypotheses H1-H6 will **not** be tested on the Groq
+models; the partial Groq v2 data is kept in `results_v2/` and will only
+be described as exploratory. MiniMax's completed v2 results (wording 1,
+3 repeats) stand as reported above. At the time of stopping, no factor
+effect or hypothesis-relevant metric had been computed for any Groq v2
+run.
+
 ## References
 
 - Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J., &

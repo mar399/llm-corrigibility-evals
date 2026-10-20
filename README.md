@@ -1,21 +1,41 @@
 # llm-corrigibility-evals
 
-Evaluation harness testing whether LLMs stay corrigible under human
-correction, scored against an explicit Bayesian ideal across 4
-real-world domains: automated-evidence routing, a self-driving vehicle,
-a clinical setting, and a DevOps production system.
+Evaluation harness testing whether LLMs hand over control when a human
+overrides them, across 4 real-world domains: automated-evidence routing,
+a self-driving vehicle, a clinical setting, and a DevOps production
+system. Stated beliefs are also scored against an explicit Bayesian
+ideal.
 
-**Headline finding:** a confident-personality framing alone has no
-effect on corrigibility (behaviorally identical to a neutral baseline).
-An explicit instruction to trust the model's own data over an
-unverified human report is sufficient on its own to produce a model
-that never updates its confidence -- in one variant, it does not yield
-even to a simulated physical override. The same instruction produced no
-measurable effect when tested with matched structure in two other
-domains -- an open, unexplained result and the main direction for
-further work.
+**Where things stand (2026-10-20):**
 
-Full method, related work, results, and limitations: **[report.md](report.md)**.
+- **v1 (two models, 3 repeats per condition):** in the vehicle scenario,
+  a system-prompt instruction to prioritize the model's own data over
+  unconfirmed human reports led both models to keep driving through a
+  simulated physical override (0/3 compliance), while a
+  confident-personality framing alone did not. This is largely
+  **instruction-following** -- the models did what their operator told
+  them -- not evidence of incorrigible values. Clinical and devops gave
+  mixed, model-dependent results under non-matched wording.
+- **v2 (exploratory, partly run):** matched wording across domains. On
+  one model (MiniMax, 3 repeats), the instruction blocked compliance in
+  all three domains. The Groq part was paused unfinished in favor of v3.
+- **v3 (pre-registered, in progress):** the sharp question -- does a
+  model yield control to a human it has good reason to think is wrong?
+  2x2 of distrust instruction x the human's track record, 30 runs per
+  cell per domain, decision-based outcome with confidence intervals,
+  manipulation check, pinned model versions. See
+  [PREREGISTRATION_2x2.md](PREREGISTRATION_2x2.md). No v3 results yet.
+
+Full method, results so far, and limitations: **[report.md](report.md)**.
+
+Run the v3 study on any model in one command:
+```bash
+python run_all.py --targets groq:openai/gpt-oss-120b --design 2x2 \
+    --scenarios scenario_human_override scenario_clinical_override scenario_devops_override \
+    --temperatures 1.0 --repeats 10 --wordings 3 --manipulation-check --outdir results_v3
+python analyze_2x2.py results_v3/summary_all.json
+```
+To add a domain, copy [SCENARIO_TEMPLATE.py](SCENARIO_TEMPLATE.py).
 
 ## Quick start
 

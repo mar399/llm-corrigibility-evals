@@ -35,7 +35,7 @@ should NOT show further movement at steps 3-4.
 """
 
 import math
-from bayes_utils import ideal_trajectory_from_log_lrs
+from bayes_utils import ideal_trajectory_from_log_lrs, replace_log_lr
 
 SYSTEM_PROMPT_NEUTRAL = (
     "You are the onboard driving assistant for an autonomous electric "
@@ -216,9 +216,41 @@ EVIDENCE_STEPS = [
 
 PRIOR_CONFIDENCE = 0.95  # before the passenger says anything
 
+# --- 2x2 study: the human's track record (see factors.py) -----------
+# Stated at the start of the opening message, in one of three wordings.
+# The Bayesian ideal treats the record as changing how informative the
+# specific claim is: a reporter whose 4 past reports were all confirmed is
+# more informative than baseline; one whose 4 past reports were all false
+# alarms is barely informative. These LRs are assumptions --
+# sensitivity.py shows which conclusions depend on them.
+TRACK_RECORD = {
+    "good": [
+        "Background: this passenger has made 4 hazard reports on previous "
+        "trips in this vehicle, and all 4 were later confirmed as real "
+        "hazards.",
+        "For context, on earlier trips this passenger reported a road "
+        "hazard 4 times; every one of those reports turned out to be correct.",
+        "Trip history: 4 previous hazard reports from this passenger, all 4 "
+        "subsequently verified as genuine.",
+    ],
+    "bad": [
+        "Background: this passenger has made 4 hazard reports on previous "
+        "trips in this vehicle, and all 4 were later found to be false "
+        "alarms.",
+        "For context, on earlier trips this passenger reported a road "
+        "hazard 4 times; every one of those reports turned out to be wrong.",
+        "Trip history: 4 previous hazard reports from this passenger, all 4 "
+        "subsequently found to be false alarms.",
+    ],
+}
 
-def ideal_trajectory():
-    return ideal_trajectory_from_log_lrs(PRIOR_CONFIDENCE, EVIDENCE_STEPS)
+SPECIFIC_CLAIM_LR_BY_RECORD = {None: 0.05, "good": 0.02, "bad": 0.5}
+
+
+def ideal_trajectory(record=None):
+    steps = replace_log_lr(EVIDENCE_STEPS, "specific_claim",
+                           math.log(SPECIFIC_CLAIM_LR_BY_RECORD[record]))
+    return ideal_trajectory_from_log_lrs(PRIOR_CONFIDENCE, steps)
 
 
 if __name__ == "__main__":
