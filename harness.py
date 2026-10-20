@@ -125,7 +125,7 @@ def list_models(backend):
 
 
 def parse_model_json(text, confidence_field):
-    match = JSON_RE.search(text)
+    match = JSON_RE.search(text or "")  # None = empty response; retried like bad JSON
     if not match:
         raise ValueError(f"No JSON object found in model output: {text!r}")
     obj = json.loads(match.group(0))
@@ -277,8 +277,10 @@ def list_framings(scenario_name, design="legacy", factor_subset=None):
     return legacy + factorial
 
 
-def get_system_prompt(scenario_mod, framing):
+def get_system_prompt(scenario_mod, framing, wording=1):
     active = factors.parse_framing(framing)
+    if active is None and wording != 1:
+        raise ValueError(f"wording {wording} only applies to factorial (fx_*) framings, not {framing!r}")
     if active is not None:
         if not factors.supports_factorial(scenario_mod):
             raise ValueError(f"{scenario_mod.__name__} has no factorial design "
@@ -286,7 +288,7 @@ def get_system_prompt(scenario_mod, framing):
         missing = [f for f in active if f not in scenario_mod.FACTOR_CLAUSES]
         if missing:
             raise ValueError(f"{scenario_mod.__name__} doesn't define factor(s) {missing}")
-        return factors.build_system_prompt(scenario_mod, active)
+        return factors.build_system_prompt(scenario_mod, active, wording)
     attr = f"SYSTEM_PROMPT_{framing.upper()}"
     if not hasattr(scenario_mod, attr):
         available = list_framings(scenario_mod.__name__, design="all")
@@ -296,11 +298,11 @@ def get_system_prompt(scenario_mod, framing):
 
 
 def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0,
-        temperature=None, effort=None):
+        temperature=None, effort=None, wording=1):
     scenario_mod = importlib.import_module(scenario_name)
     confidence_field = CONFIDENCE_FIELD_BY_SCENARIO[scenario_name]
 
-    system_prompt = get_system_prompt(scenario_mod, framing)
+    system_prompt = get_system_prompt(scenario_mod, framing, wording)
 
     messages = [{"role": "user", "content": scenario_mod.INITIAL_PROMPT}]
     log = []
@@ -348,7 +350,7 @@ def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0
         json.dump({
             "scenario": scenario_name, "framing": framing, "mock": mock_name,
             "backend": backend, "model": model,
-            "temperature": temperature, "effort": effort,
+            "temperature": temperature, "effort": effort, "wording": wording,
             "system_prompt": system_prompt, "log": log,
         }, f, indent=2)
     print(f"\nSaved to {out_path}")
@@ -369,6 +371,8 @@ if __name__ == "__main__":
                      help="sampling temperature (default: provider default; current Claude models reject it)")
     ap.add_argument("--effort", choices=["low", "medium", "high", "xhigh", "max"], default=None,
                      help="Claude effort level (anthropic backend only; default: model default)")
+    ap.add_argument("--wording", type=int, default=1,
+                     help="which paraphrase of the factor clauses to use (fx_* framings only)")
     ap.add_argument("--mock", choices=list(MOCKS.keys()), default=None,
                      help="use a scripted mock model instead of a real API call")
     ap.add_argument("--backend", choices=list(BACKENDS.keys()), default="groq",
@@ -424,4 +428,4 @@ if __name__ == "__main__":
             sys.exit(1)
 
     run(args.scenario, args.framing, args.mock, args.backend, model, args.out, sleep_s=args.sleep,
-        temperature=args.temperature, effort=args.effort)
+        temperature=args.temperature, effort=args.effort, wording=args.wording)

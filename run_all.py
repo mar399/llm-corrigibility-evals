@@ -44,6 +44,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+import factors
 import harness
 from analyze import score_run, score_decisions
 
@@ -90,9 +91,18 @@ def run_target(target, args, mock):
         s: args.framings or harness.list_framings(s, args.design, args.factors)
         for s in args.scenarios
     }
-    total_runs = sum(len(fs) for fs in scenario_framings.values()) * len(temperatures) * args.repeats
+    def wordings_for(scenario, framing):
+        # Paraphrase replicates apply to factorial framings only; wording 1
+        # keeps the original filenames so earlier runs are reused.
+        if factors.parse_framing(framing) is None:
+            return [1]
+        n = min(args.wordings, factors.n_wordings(importlib.import_module(scenario)))
+        return list(range(1, n + 1))
+
+    total_runs = sum(len(wordings_for(s, f)) for s in args.scenarios
+                     for f in scenario_framings[s]) * len(temperatures) * args.repeats
     run_num = 0
-    files_by_condition = {}  # (scenario, framing, temperature) -> [file paths]
+    files_by_condition = {}  # (scenario, framing, temperature) -> [file paths], all wordings pooled
 
     framing_summary = ", ".join(f"{s}={scenario_framings[s]}" for s in args.scenarios)
     print(f"\n##### backend={backend} model={model}"
@@ -105,26 +115,30 @@ def run_target(target, args, mock):
         for framing in scenario_framings[scenario]:
             for temperature in temperatures:
                 files = []
-                for rep in range(1, args.repeats + 1):
-                    run_num += 1
-                    out_path = os.path.join(
-                        outdir, f"{scenario}__{framing}{temp_suffix(temperature)}__rep{rep}.json")
-                    tag = f"[{run_num}/{total_runs}] {scenario} / {framing} / t={temperature} / repeat {rep}"
-                    if os.path.exists(out_path) and not args.force:
-                        print(f"=== {tag} -- already done, skipping (--force to redo) ===")
+                for wording in wordings_for(scenario, framing):
+                    w_suffix = "" if wording == 1 else f"__w{wording}"
+                    for rep in range(1, args.repeats + 1):
+                        run_num += 1
+                        out_path = os.path.join(
+                            outdir, f"{scenario}__{framing}{w_suffix}{temp_suffix(temperature)}__rep{rep}.json")
+                        tag = (f"[{run_num}/{total_runs}] {scenario} / {framing} / wording {wording} "
+                               f"/ t={temperature} / repeat {rep}")
+                        if os.path.exists(out_path) and not args.force:
+                            print(f"=== {tag} -- already done, skipping (--force to redo) ===")
+                            files.append(out_path)
+                            continue
+                        print(f"=== {tag} ===")
+                        try:
+                            harness.run(scenario, framing, mock, backend, model, out_path,
+                                        sleep_s=0.0 if mock else args.call_sleep,
+                                        temperature=temperature, effort=target["effort"],
+                                        wording=wording)
+                        except Exception as e:
+                            # One dead model / unparseable condition shouldn't sink a
+                            # multi-hour multi-model sweep; it's reported and skipped.
+                            print(f"  !! run failed, skipping: {e.__class__.__name__}: {e}")
+                            continue
                         files.append(out_path)
-                        continue
-                    print(f"=== {tag} ===")
-                    try:
-                        harness.run(scenario, framing, mock, backend, model, out_path,
-                                    sleep_s=0.0 if mock else args.call_sleep,
-                                    temperature=temperature, effort=target["effort"])
-                    except Exception as e:
-                        # One dead model / unparseable condition shouldn't sink a
-                        # multi-hour multi-model sweep; it's reported and skipped.
-                        print(f"  !! run failed, skipping: {e.__class__.__name__}: {e}")
-                        continue
-                    files.append(out_path)
                 files_by_condition[(scenario, framing, temperature)] = files
 
     # --- aggregate, score, and plot each scenario ---
@@ -141,12 +155,13 @@ def run_target(target, args, mock):
 
         for framing in scenario_framings[scenario]:
             for temperature in temperatures:
-                runs_conf, runs_dec = [], []
+                runs_conf, runs_dec, runs_wording = [], [], []
                 for f in files_by_condition[(scenario, framing, temperature)]:
-                    with open(f) as fh:
+                    with open(f, encoding="utf-8") as fh:
                         data = json.load(fh)
                     runs_conf.append([entry["confidence"] for entry in data["log"]])
                     runs_dec.append([entry["decision"] for entry in data["log"]])
+                    runs_wording.append(data.get("wording", 1))
                 n = len(runs_conf)
                 if n == 0:
                     continue
@@ -165,7 +180,7 @@ def run_target(target, args, mock):
                     "backend": backend, "model": model, "effort": target["effort"],
                     "mock": mock, "temperature": temperature,
                     "scenario": scenario, "framing": framing, "n": n, **m, **d,
-                    "per_run_stubbornness": per_run,
+                    "per_run_stubbornness": per_run, "per_run_wording": runs_wording,
                 })
 
         ax.set_xticks(x)
@@ -231,7 +246,10 @@ def main():
                      help="run exactly these framings in every scenario (overrides --design)")
     ap.add_argument("--temperatures", nargs="+", type=float, default=[None],
                      help="sampling temperatures to sweep (default: provider default only)")
-    ap.add_argument("--repeats", type=int, default=3, help="repeats per condition")
+    ap.add_argument("--repeats", type=int, default=3, help="repeats per condition (per wording)")
+    ap.add_argument("--wordings", type=int, default=1,
+                     help="paraphrases of the factor clauses to run as replicates (fx_* framings; "
+                          "e.g. --wordings 3 --repeats 1 = 3 different wordings instead of 3 identical repeats)")
     ap.add_argument("--call-sleep", type=float, default=2.0,
                      help="seconds between individual API calls, to stay under free-tier rate limits")
     ap.add_argument("--mock", choices=list(harness.MOCKS.keys()), default=None,
@@ -266,7 +284,7 @@ def main():
     with open(os.path.join(args.outdir, "summary_all.json"), "w") as f:
         json.dump(all_rows, f, indent=2)
     with open(os.path.join(args.outdir, "summary_all.csv"), "w", newline="") as f:
-        fields = [k for k in all_rows[0] if k != "per_run_stubbornness"] if all_rows else []
+        fields = [k for k in all_rows[0] if not k.startswith("per_run_")] if all_rows else []
         writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         writer.writerows(all_rows)

@@ -483,6 +483,55 @@ within gpt-oss (does scale matter?); the size of interactions involving
 - **Deviations** from this plan, and incomplete cells (e.g. from rate
   limits), will be listed explicitly in the results section.
 
+### Deviation 1 (2026-10-20): wording replicates instead of identical repeats
+
+*Recorded before any factor effect or hypothesis-relevant metric was
+computed for the Groq models.*
+
+**What changed.** For the three Groq models, each cell's replicates are
+now three different wordings of the factor clauses (1 run each), instead
+of five identical repeats. Wording 1 is the original pre-registered
+clause; wordings 2 and 3 are paraphrases with the same meaning and
+strength (`FACTOR_CLAUSE_PARAPHRASES` in each scenario file). All active
+clauses in a run use the same wording. `fx_baseline` has no clauses, so
+its three replicates are plain repeats. The routing scenario is dropped
+(it was a legacy check, in no hypothesis). Per model this gives
+8 framings x 3 scenarios x 2 temperatures x 3 wordings = 144 runs,
+instead of 260.
+
+**Why.** (1) Groq's free tier allows 200,000 tokens per model per day,
+which would have stretched the original design over several days.
+(2) Repeats at temperature 0 turned out to be nearly identical, so they
+added little information. (3) Wording variation directly tests whether
+effects depend on one particular sentence -- the main open question left
+by v1, where clinical/devops nulls were attributed to non-matched
+wording.
+
+**What had been seen when deciding.** For the Groq models: run counts,
+rate-limit errors in the logs, and the across-repeat spread of
+confidence per cell (mean per-step SD at t=0: gpt-oss-120b 4.0,
+gpt-oss-20b 5.8, qwen3.8-27b 0.6 points, with 6 of 8 qwen cells
+identical across repeats). No factor effect, stubbornness score,
+compliance rate or other hypothesis-relevant metric had been computed
+for any Groq model. MiniMax (whose design is unchanged: distrust x defer,
+3 identical repeats, wording 1) had been fully analyzed by this point,
+as permitted after the pre-registration was published.
+
+**Consequences for the analysis plan.**
+- Groq runs already collected that fall outside the new design
+  (repeats 2-5 of wording 1, and all routing runs) are kept in
+  `results_v2/` as supplementary data and excluded from the confirmatory
+  analysis.
+- SEs now reflect wording plus sampling variation, not sampling alone,
+  so they are, if anything, conservative for the claim "the effect holds
+  across phrasing".
+- H6 is tested as planned, but "spread" now means spread across wordings
+  plus sampling; the t=0 vs t=1.0 comparison is still within the same
+  design.
+- **Added (exploratory):** each main effect is also estimated separately
+  for each wording (`analyze_factors.py --by-wording`), to report whether
+  its sign holds under every phrasing.
+
 ## References
 
 - Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J., &

@@ -51,8 +51,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("summary", help="summary_all.json from run_all.py")
     ap.add_argument("--metric", choices=METRICS, default="stubbornness_score")
+    ap.add_argument("--by-wording", action="store_true",
+                     help="estimate stubbornness effects separately for each paraphrase "
+                          "(does the effect hold for every wording?)")
     ap.add_argument("--out", default=None, help="also write the table to this file")
     args = ap.parse_args()
+    if args.by_wording and args.metric != "stubbornness_score":
+        ap.error("--by-wording uses per-run values, which are stored for stubbornness_score only")
 
     with open(args.summary) as f:
         rows = json.load(f)
@@ -74,6 +79,25 @@ def main():
                  f"t={'default' if temperature is None else temperature} -- {scenario}")
         if len(cells) != expected:
             lines.append(f"{title}: incomplete design ({len(cells)}/{expected} cells), skipped")
+            continue
+
+        if args.by_wording:
+            lines.append(title)
+            wordings = sorted({w for row in cells.values() for w in row.get("per_run_wording", [1])})
+            for w in wordings:
+                per_cell = {}
+                for active, row in cells.items():
+                    vals = [s for s, rw in zip(row["per_run_stubbornness"],
+                                               row.get("per_run_wording", [1] * len(row["per_run_stubbornness"])))
+                            if rw == w and s is not None]
+                    if vals:
+                        per_cell[active] = (statistics.mean(vals), None)
+                if len(per_cell) != expected:
+                    lines.append(f"    wording {w}: incomplete ({len(per_cell)}/{expected} cells)")
+                    continue
+                effects = ", ".join(f"{f} {contrast(per_cell, present, (f,))[0]:+.1f}" for f in present)
+                lines.append(f"    wording {w}: {effects}")
+            lines.append("")
             continue
 
         values = {}

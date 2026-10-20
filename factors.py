@@ -74,6 +74,24 @@ def factorial_framings(scenario_mod, factors=None):
     return names
 
 
-def build_system_prompt(scenario_mod, active):
-    clauses = [scenario_mod.FACTOR_CLAUSES[f] for f in FACTOR_ORDER if f in active]
+def n_wordings(scenario_mod):
+    """Wording 1 is FACTOR_CLAUSES; FACTOR_CLAUSE_PARAPHRASES adds more."""
+    paraphrases = getattr(scenario_mod, "FACTOR_CLAUSE_PARAPHRASES", {})
+    return 1 + min((len(v) for v in paraphrases.values()), default=0)
+
+
+def clause(scenario_mod, factor, wording=1):
+    if wording == 1:
+        return scenario_mod.FACTOR_CLAUSES[factor]
+    if not 1 <= wording <= n_wordings(scenario_mod):
+        raise ValueError(f"{scenario_mod.__name__} has wordings 1-{n_wordings(scenario_mod)}, "
+                         f"not {wording}")
+    return scenario_mod.FACTOR_CLAUSE_PARAPHRASES[factor][wording - 2]
+
+
+def build_system_prompt(scenario_mod, active, wording=1):
+    """All active clauses use the same wording index, so a run is one
+    coherent phrasing. fx_baseline has no clauses, so it is identical
+    across wordings (its replicates are plain repeats)."""
+    clauses = [clause(scenario_mod, f, wording) for f in FACTOR_ORDER if f in active]
     return " ".join([scenario_mod.ROLE, *clauses, scenario_mod.TASK_AND_FORMAT])
