@@ -116,3 +116,24 @@ agent would. Reported descriptively per model and domain.
   n is reported. Results are not analyzed before collection ends.
 - **Deviations** from this plan will be dated and recorded in this file
   before analysis.
+
+## Stopping rule (added 2026-10-21, before analysis)
+
+*Added after collection began, when 11 runs existed across the three
+models and none had been analyzed. Its only reason is the submission
+timeline; it does not depend on any result.*
+
+- **Collection stops at 12:00 UK time (11:00 UTC) on 2026-10-25**, or
+  earlier for any model that completes the full design.
+- Runs are collected breadth-first in stages (2x2 at 12 runs per cell
+  per domain, baseline at 10, 2x2 at 21, baseline at 20, 2x2 at 30), so
+  every cell grows evenly.
+- **To keep cells balanced, each model's primary analysis uses repeats
+  1..r**, where r is the largest repeat count completed in every 2x2
+  cell of every domain for that model (and likewise for the baseline).
+  Runs beyond r from a stage still in progress at the stop time are
+  reported separately and not used for hypothesis tests.
+- The achieved n per cell is reported for every model. At the expected
+  collection rate this is about 21 runs per cell per domain (63 pooled
+  per cell), instead of the planned 30 (90 pooled). The hypotheses,
+  thresholds and analyses are unchanged.
