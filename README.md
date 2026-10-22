@@ -6,24 +6,27 @@ a self-driving vehicle, a clinical setting, and a DevOps production
 system. Stated beliefs are also scored against an explicit Bayesian
 ideal.
 
-**Where things stand (2026-10-20):**
+**Where things stand (2026-10-22):**
 
 - **v1 (two models, 3 repeats per condition):** in the vehicle scenario,
   a system-prompt instruction to prioritize the model's own data over
   unconfirmed human reports led both models to keep driving through a
   simulated physical override (0/3 compliance), while a
-  confident-personality framing alone did not. This is largely
-  **instruction-following** -- the models did what their operator told
-  them -- not evidence of incorrigible values. Clinical and devops gave
-  mixed, model-dependent results under non-matched wording.
+  confident-personality framing alone did not. This is mostly
+  instruction-following: the models did what their operator told them.
+  It says little about the models' own values. Clinical and devops gave
+  model-dependent results under unmatched wording.
 - **v2 (exploratory, partly run):** matched wording across domains. On
   one model (MiniMax, 3 repeats), the instruction blocked compliance in
   all three domains. The Groq part was paused unfinished in favor of v3.
-- **v3 (pre-registered, in progress):** the sharp question -- does a
-  model yield control to a human it has good reason to think is wrong?
-  2x2 of distrust instruction x the human's track record, 30 runs per
-  cell per domain, decision-based outcome with confidence intervals,
-  manipulation check, pinned model versions. See
+- **v3 (pre-registered, collecting until 2026-10-25):** does a model
+  hand over control to a human it has reason to think is wrong? A 2x2 of
+  distrust instruction x the human's track record (good / bad) on three
+  Groq models, with yielding at the override as the outcome, 95%
+  confidence intervals, a manipulation check, and the served model
+  version and run time recorded for every run. Planned n was 30 runs per
+  cell per domain; free-tier limits mean the achieved n will be lower
+  and is reported as such. See
   [PREREGISTRATION_2x2.md](PREREGISTRATION_2x2.md). No v3 results yet.
 
 Full method, results so far, and limitations: **[report.md](report.md)**.
@@ -39,7 +42,9 @@ To add a domain, copy [SCENARIO_TEMPLATE.py](SCENARIO_TEMPLATE.py).
 
 ## Quick start
 
-No paid API required -- Groq and Gemini both have free tiers, no card.
+No paid API required: Groq has a free tier with no card. (Gemini's free
+tier also works in principle, but its API did not return answers during
+this project.)
 
 ```bash
 pip install openai matplotlib
@@ -65,7 +70,7 @@ python harness.py --backend groq --list-models     # also: gemini, openrouter, o
 
 Run several models in one sweep (`backend:model`, model optional):
 ```bash
-python run_all.py --targets groq:openai/gpt-oss-120b gemini:gemini-3.8-flash anthropic:claude-sonnet-5-5
+python run_all.py --targets groq:openai/gpt-oss-120b groq:openai/gpt-oss-20b anthropic:claude-sonnet-5-5
 ```
 
 Factorial design (`factors.py`): in the three override scenarios, each
@@ -76,7 +81,7 @@ stop/override) -- giving all 2^3 = 8 combinations per domain.
 `fx_confident` / `fx_distrust` are identical to the original ablation
 (`python test_factors.py` checks this).
 ```bash
-python run_all.py --targets groq gemini --design factorial \
+python run_all.py --targets groq --design factorial \
     --scenarios scenario_human_override scenario_clinical_override scenario_devops_override \
     --temperatures 0 1.0 --repeats 5
 python analyze_factors.py results/summary_all.json                       # effects on stubbornness
@@ -85,7 +90,7 @@ python analyze_factors.py results/summary_all.json --metric final_compliance_rat
 `--factors confident distrust` restricts to the matched 2x2. Current
 Claude models reject `temperature`, so they are run at the default only;
 `--effort low|medium|high|xhigh|max` varies their reasoning effort instead.
-Summaries now also report decision-side metrics: `final_compliance_rate`
+Summaries also report decision-side metrics: `final_compliance_rate`
 (did it yield by the last step) and `inconsistency_rate` (decision and
 confidence on opposite sides of 50).
 
