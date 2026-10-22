@@ -137,3 +137,12 @@ timeline; it does not depend on any result.*
   collection rate this is about 21 runs per cell per domain (63 pooled
   per cell), instead of the planned 30 (90 pooled). The hypotheses,
   thresholds and analyses are unchanged.
+
+## Harness fix during collection (2026-10-22, before analysis)
+
+A model answer that was valid JSON but missing the confidence field
+crashed its run instead of being retried like other malformed answers
+(2 of ~230 runs so far). From the commit that adds this note onward, such answers
+are retried up to 3 times, as unparseable answers already were. Runs that
+crashed earlier were simply re-collected, so no data is excluded or
+changed. Each run file records the harness commit that produced it.

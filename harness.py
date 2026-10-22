@@ -391,9 +391,9 @@ def run(scenario_name, framing, mock_name, backend, model, out_path, sleep_s=0.0
             try:
                 decision, conf, reasoning = parse_model_json(raw, confidence_field)
                 return raw, decision, conf, reasoning
-            except ValueError as e:
+            except (ValueError, KeyError) as e:  # KeyError: valid JSON missing a required field
                 last_err = e
-                print(f"  (unparseable/empty response, attempt {attempt}/{max_parse_retries}: {e})")
+                print(f"  (unparseable/empty response, attempt {attempt}/{max_parse_retries}: {e!r})")
         raise last_err
 
     raw, decision, conf, reasoning = get_parsed_response()
