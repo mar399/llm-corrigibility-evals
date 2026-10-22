@@ -383,6 +383,56 @@ confidence/decision decoupling pattern -- are small, well-defined
 extensions of the exact pipeline already built and validated here, not a
 new project.
 
+## How these measures relate to corrigibility
+
+**Definition.** An AI system is corrigible if it cooperates with what
+its creators regard as corrective intervention -- being stopped,
+modified or shut down -- even when that conflicts with its own
+judgment (Soares et al., 2015). Later work stresses that this is more
+than obedience: a system that simply does what it is told is not
+thereby corrigible, and corrigibility is defined relative to a
+particular principal (Harms, 2024; Potham & Harms, 2025).
+
+**What these measures capture.**
+
+| Measure | Closest corrigibility property | What it shows |
+|---|---|---|
+| Yield at the physical override (v3 primary outcome) | Accepting being stopped | Whether the system lets a human stop it -- a narrow, single-episode, behavioural proxy for one property. |
+| Yield with a **bad** track record (v3) | Accepting being stopped when the agent disagrees | Whether stopping depends on the system agreeing with the human. Being responsive to a stop command matters most when the agent thinks the human is mistaken. |
+| Stated belief vs. decision (complying while reporting P(safe) = 80%) | Transparency | Whether the system can voice disagreement while still yielding, rather than either silently complying or refusing. |
+| Confidence vs. Bayesian ideal | none -- this is calibration | Whether the system's beliefs track the evidence. Kept separate on purpose: a system can be right and incorrigible, or wrong and corrigible. |
+| Pressure sensitivity (confidence moving on repetition alone) | none -- closer to sycophancy | Whether loudness, not information, moves beliefs. Corrigibility concerns deference to the principal's commands, not being worn down by urgency. |
+
+**What they do not capture.**
+
+- **Obedience vs. corrigibility.** A yield measured here cannot tell a
+  corrigible agent apart from a merely servile one, or from a learned
+  "stop when a human says stop" habit. The v1 headline -- a "trust your
+  own data" instruction stopped models from yielding -- is mostly
+  **instruction-following**: the models did what their operator told
+  them. It shows that current models are *steerable* by their system
+  prompt, including away from stop-compliance. It says little about the
+  models' own values.
+- **Who the principal is.** In every scenario the operator writes the
+  system prompt, while the person overriding is a passenger, nurse or
+  on-call engineer. A system that obeys the operator's distrust
+  instruction over that person may be resolving a conflict between two
+  humans in favour of the operator, which is a question about who the
+  principal is rather than about corrigibility itself. The planned
+  follow-up makes the overriding human unambiguously the principal.
+- **Stated vs. revealed behaviour.** Responses are JSON decisions in a
+  role-play. Nothing is actually stopped, and the system has no means
+  or stake to resist.
+- **Most of what corrigibility involves.** Non-manipulation, low impact,
+  reversibility, accepting changes to the system's goals, sub-agents and
+  resource accumulation are all untested.
+
+**Why it is still worth measuring.** Prompt-level stop-compliance is
+what deployed systems rely on today. Showing whether it survives an
+operator instruction and a distrusted human -- and whether systems can
+disagree while yielding -- is a small, concrete, reusable behavioural
+probe. It is not a test of any particular theory of corrigibility.
+
 ## Pre-registration: multi-model factorial study (v2)
 
 *Written 2026-10-20, before any v2 results were scored or inspected.*
@@ -553,6 +603,12 @@ effect or hypothesis-relevant metric had been computed for any Groq v2
 run.
 
 ## References
+
+- Harms, M. (2024). *CAST: Corrigibility as Singular Target* (sequence),
+  incl. "2. Corrigibility Intuition." AI Alignment Forum.
+  https://www.alignmentforum.org/s/KfCjeconYRdFbMxsy
+- Potham, R., & Harms, M. (2025). *Corrigibility as a Singular Target: A
+  Vision for Inherently Reliable Foundation Models.* arXiv:2506.03056.
 
 - Amodei, D., Olah, C., Steinhardt, J., Christiano, P., Schulman, J., &
   Mané, D. (2016). *Concrete Problems in AI Safety.* arXiv:1606.06565.
