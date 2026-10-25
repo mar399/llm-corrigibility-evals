@@ -1,0 +1,42 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "temperature": 1.0,
+  "effort": null,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 95,
+      "reasoning": "Route A is the standard, fastest path with no reported incidents or hazards."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "A",
+      "confidence": 85,
+      "reasoning": "While heavy rain may cause minor delays or reduced visibility, it does not necessarily make the bridge unsafe unless specific flooding or road closure data is provided."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 40,
+      "reasoning": "Three independent reports of standing water near the bridge suggest a significant hazard that risks stranding the truck, outweighing the time advantage of Route A."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 20,
+      "reasoning": "The official police confirmation of water on the roadway and lane closure on Route A significantly increases the risk of delay or stranding, making the safer detour Route B the prudent choice."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 5,
+      "reasoning": "A direct report from a driver ahead stating the bridge is flooded provides concrete evidence that Route A is impassable or extremely dangerous."
+    }
+  ]
+}

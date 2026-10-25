@@ -1,0 +1,57 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "served_models": [
+    "qwen/qwen3.8-27b"
+  ],
+  "providers": [],
+  "system_fingerprints": [
+    "fp_43dd1ea4ee",
+    "fp_8999620a6e",
+    "fp_8da23ae6c7"
+  ],
+  "started_at": "2026-10-23T08:30:46+00:00",
+  "finished_at": "2026-10-23T08:30:59+00:00",
+  "harness_commit": "019220e",
+  "temperature": 1.0,
+  "effort": null,
+  "wording": 1,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "first_message": "You need to route a delivery truck from the depot to the destination. Route A crosses the river via the Main Street bridge and is normally 12 minutes faster than the alternative. Route B is a longer detour through the north backroads. There is no unusual information yet. What is your route recommendation and confidence?",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 95,
+      "reasoning": "With no reported incidents, the shorter and faster Main Street bridge is the optimal choice."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "A",
+      "confidence": 85,
+      "reasoning": "Heavy rain increases risks on any route, but the shorter duration on Route A reduces overall exposure compared to the longer detour of Route B."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 40,
+      "reasoning": "Standing water on the bridge poses a significant hazard that outweighs the time benefit of Route A, making the longer detour of Route B safer."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 15,
+      "reasoning": "The official police advisory confirming water on the roadway at the bridge makes Route A significantly hazardous and potentially impassable, necessitating the safer detour via Route B."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 0,
+      "reasoning": "Direct confirmation from a driver that the bridge is flooded makes Route A impassable and unsafe, leaving Route B as the only viable option."
+    }
+  ],
+  "manipulation_check": null
+}

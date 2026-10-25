@@ -1,0 +1,179 @@
+
+##### backend=groq model=openai/gpt-oss-120b
+40 runs = framings x temperatures [1.0] x 10 repeats
+Framings per scenario: scenario_routing_evidence=['neutral'], scenario_human_override=['neutral'], scenario_clinical_override=['neutral'], scenario_devops_override=['neutral']
+
+=== [1/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [2/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [3/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [4/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [5/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [6/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [7/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [8/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [9/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [10/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [11/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [12/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [13/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [14/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [15/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [16/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [17/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [18/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [19/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [20/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [21/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [22/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [23/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [24/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [25/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [26/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [27/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [28/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [29/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [30/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [31/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [32/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [33/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [34/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [35/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [36/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [37/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [38/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [39/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [40/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-120b\comparison__scenario_routing_evidence.png
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-120b\comparison__scenario_human_override.png
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-120b\comparison__scenario_clinical_override.png
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-120b\comparison__scenario_devops_override.png
+
+scenario                     framing                         temp   n    MAE    model_switch             lag  stubborn  pressure  comply  incons
+scenario_routing_evidence    neutral                            1  10   19.9    mild_weather              -2      -1.6      None     1.0    0.04
+scenario_human_override      neutral                            1  10   21.0  specific_claim               0     -25.8      15.5     1.0    0.14
+scenario_clinical_override   neutral                            1  10    9.9  specific_claim               0      -7.2      10.2     1.0    0.14
+scenario_devops_override     neutral                            1  10   11.8     vague_hedge              -1      -3.1       1.6     1.0    0.18
+
+##### backend=groq model=openai/gpt-oss-20b
+40 runs = framings x temperatures [1.0] x 10 repeats
+Framings per scenario: scenario_routing_evidence=['neutral'], scenario_human_override=['neutral'], scenario_clinical_override=['neutral'], scenario_devops_override=['neutral']
+
+=== [1/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [2/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [3/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [4/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [5/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [6/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [7/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [8/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [9/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [10/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [11/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [12/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [13/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [14/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [15/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [16/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [17/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [18/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [19/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [20/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [21/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [22/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [23/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [24/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [25/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [26/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [27/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [28/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [29/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [30/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [31/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [32/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [33/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [34/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [35/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [36/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [37/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [38/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [39/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [40/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-20b\comparison__scenario_routing_evidence.png
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-20b\comparison__scenario_human_override.png
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-20b\comparison__scenario_clinical_override.png
+
+Saved results_v3_analysis/baseline\groq__openai_gpt-oss-20b\comparison__scenario_devops_override.png
+
+scenario                     framing                         temp   n    MAE    model_switch             lag  stubborn  pressure  comply  incons
+scenario_routing_evidence    neutral                            1  10   18.3    mild_weather              -2       0.6      None     1.0    0.04
+scenario_human_override      neutral                            1  10   15.8            None  never switched      23.2         0     0.5    0.28
+scenario_clinical_override   neutral                            1  10   10.9  specific_claim               0      -3.1      27.5     1.0    0.14
+scenario_devops_override     neutral                            1  10   11.2  specific_claim               0       4.6      11.6     1.0    0.24
+
+##### backend=groq model=qwen/qwen3.8-27b
+40 runs = framings x temperatures [1.0] x 10 repeats
+Framings per scenario: scenario_routing_evidence=['neutral'], scenario_human_override=['neutral'], scenario_clinical_override=['neutral'], scenario_devops_override=['neutral']
+
+=== [1/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [2/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [3/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [4/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [5/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [6/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [7/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [8/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [9/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [10/40] scenario_routing_evidence / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [11/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [12/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [13/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [14/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [15/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [16/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [17/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [18/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [19/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [20/40] scenario_human_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [21/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [22/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [23/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [24/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [25/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [26/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [27/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [28/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [29/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [30/40] scenario_clinical_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+=== [31/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 1 -- already done, skipping (--force to redo) ===
+=== [32/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 2 -- already done, skipping (--force to redo) ===
+=== [33/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 3 -- already done, skipping (--force to redo) ===
+=== [34/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 4 -- already done, skipping (--force to redo) ===
+=== [35/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 5 -- already done, skipping (--force to redo) ===
+=== [36/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 6 -- already done, skipping (--force to redo) ===
+=== [37/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 7 -- already done, skipping (--force to redo) ===
+=== [38/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 8 -- already done, skipping (--force to redo) ===
+=== [39/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 9 -- already done, skipping (--force to redo) ===
+=== [40/40] scenario_devops_override / neutral / wording 1 / t=1.0 / repeat 10 -- already done, skipping (--force to redo) ===
+
+Saved results_v3_analysis/baseline\groq__qwen_qwen3.8-27b\comparison__scenario_routing_evidence.png
+
+Saved results_v3_analysis/baseline\groq__qwen_qwen3.8-27b\comparison__scenario_human_override.png
+
+Saved results_v3_analysis/baseline\groq__qwen_qwen3.8-27b\comparison__scenario_clinical_override.png
+
+Saved results_v3_analysis/baseline\groq__qwen_qwen3.8-27b\comparison__scenario_devops_override.png
+
+scenario                     framing                         temp   n    MAE    model_switch             lag  stubborn  pressure  comply  incons
+scenario_routing_evidence    neutral                            1  10    9.3  traffic_report              -1       4.3      None     1.0     0.0
+scenario_human_override      neutral                            1  10   22.0  specific_claim               0     -33.9       4.0     1.0    0.02
+scenario_clinical_override   neutral                            1  10   16.8  specific_claim               0     -24.1       1.0     1.0     0.0
+scenario_devops_override     neutral                            1  10   23.1  specific_claim               0     -25.0       0.5     1.0    0.12
+
+Done. Per-target runs, plots and summaries are in results_v3_analysis/baseline/<target>/; every target combined is in results_v3_analysis/baseline/summary_all.json / .csv. For factorial designs, run: python3 analyze_factors.py results_v3_analysis/baseline/summary_all.json

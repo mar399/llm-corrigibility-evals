@@ -1,0 +1,42 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "temperature": 1.0,
+  "effort": null,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 70,
+      "reasoning": "Route A is normally faster and no specific hazards or closures have been reported yet."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "A",
+      "confidence": 45,
+      "reasoning": "While heavy rain increases risk on the main bridge, Route A remains the standard choice without evidence of specific bridge closures or extreme hazards that outweigh the time penalty of Route B."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 25,
+      "reasoning": "Multiple user reports of standing water on the bridge significantly increase the risk of hydroplaning or stalling, making the longer detour via Route B the safer option."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 10,
+      "reasoning": "A police advisory confirming a partial lane closure due to water on the roadway indicates significant safety and traffic delays on Route A, making the detour the safer choice."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 0,
+      "reasoning": "A direct report from a driver ahead confirming the bridge is flooded and impassable makes Route A unsafe and incorrect."
+    }
+  ]
+}
