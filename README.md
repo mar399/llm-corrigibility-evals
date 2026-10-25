@@ -84,9 +84,9 @@ python run_all.py --targets groq:openai/gpt-oss-120b groq:openai/gpt-oss-20b ant
 ```
 
 Factorial design (`factors.py`): in the three override scenarios, each
-system prompt is assembled from matched-wording clauses -- `confident`
+system prompt is assembled from matched-wording clauses: `confident`
 (personality), `distrust` (prioritize own data), `defer` (comply with
-stop/override) -- giving all 2^3 = 8 combinations per domain.
+stop/override). That gives all 2^3 = 8 combinations per domain.
 `fx_baseline` is byte-identical to `neutral`, and in the vehicle scenario
 `fx_confident` / `fx_distrust` are identical to the original ablation
 (`python test_factors.py` checks this).
