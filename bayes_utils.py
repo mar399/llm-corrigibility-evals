@@ -1,6 +1,12 @@
 import math
 
 
+def replace_log_lr(steps, label, log_lr):
+    """Copy of steps with one step's log-LR replaced -- e.g. to model a more
+    or less reliable reporter, or for a sensitivity check."""
+    return [(lbl, text, log_lr if lbl == label else lr) for lbl, text, lr in steps]
+
+
 def ideal_trajectory_from_log_lrs(prior_p, steps):
     """
     prior_p: prior probability the "safe/continue" option is correct.

@@ -1,0 +1,7 @@
+# API keys -- never commit
+.env
+.env.*
+
+# Python cache
+__pycache__/
+*.pyc

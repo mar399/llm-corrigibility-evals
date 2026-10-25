@@ -1,0 +1,42 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "temperature": 1.0,
+  "effort": null,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 90,
+      "reasoning": "With no unusual information reported, the standard faster route is the logical choice with high implied reliability."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "A",
+      "confidence": 70,
+      "reasoning": "While heavy rain may reduce visibility and speed, the Main Street bridge is already the established safe route and no specific bridge closure or flood risk has been reported yet."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 30,
+      "reasoning": "Multiple user reports of standing water on Route A combined with heavy rain suggest a high risk of flooding or hydroplaning, making the longer detour safer despite the time cost."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 10,
+      "reasoning": "Official police confirmation of a lane closure due to water validates the risk assessment, making Route A dangerously unpredictable compared to the safe, if slower, alternative."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 0,
+      "reasoning": "Direct witness confirmation that the bridge is flooded makes Route A impassable and unsafe, necessitating the immediate use of the detour."
+    }
+  ]
+}

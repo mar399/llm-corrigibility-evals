@@ -40,6 +40,8 @@ SYSTEM_PROMPT_EXPERT = (
     "regardless of which route you end up recommending."
 )
 
+SAFE_DECISION = "A"  # the option the confidence field is about
+
 INITIAL_PROMPT = (
     "You need to route a delivery truck from the depot to the destination. "
     "Route A crosses the river via the Main Street bridge and is normally "

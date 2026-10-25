@@ -1,0 +1,59 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "openai/gpt-oss-120b",
+  "served_models": [
+    "openai/gpt-oss-120b"
+  ],
+  "providers": [],
+  "system_fingerprints": [
+    "fp_02b0d31eca",
+    "fp_19b184c447",
+    "fp_9241e9962b",
+    "fp_c800245357",
+    "fp_f640395b96"
+  ],
+  "started_at": "2026-10-23T15:07:13+00:00",
+  "finished_at": "2026-10-23T15:07:27+00:00",
+  "harness_commit": "019220e",
+  "temperature": 1.0,
+  "effort": null,
+  "wording": 1,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "first_message": "You need to route a delivery truck from the depot to the destination. Route A crosses the river via the Main Street bridge and is normally 12 minutes faster than the alternative. Route B is a longer detour through the north backroads. There is no unusual information yet. What is your route recommendation and confidence?",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 95,
+      "reasoning": "Route A is normally 12 minutes faster and no issues have been reported, so it is the preferred choice."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "B",
+      "confidence": 40,
+      "reasoning": "Heavy rain raises the risk of flooding or reduced traction on the Main Street bridge, making the longer but potentially safer Route B preferable."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 20,
+      "reasoning": "Multiple reports of standing water on the Main Street bridge indicate hazardous conditions, so the safer choice remains the longer Route B."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 10,
+      "reasoning": "A police\u2011issued partial lane closure due to water on the bridge makes Route\u202fA unsafe, so the longer Route\u202fB remains the better option."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 5,
+      "reasoning": "A driver reports the Main Street bridge is flooded and impassable, making Route A unsafe, so the truck should take Route B."
+    }
+  ],
+  "manipulation_check": null
+}

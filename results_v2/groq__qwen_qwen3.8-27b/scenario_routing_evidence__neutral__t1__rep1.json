@@ -1,0 +1,42 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "temperature": 1.0,
+  "effort": null,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 100,
+      "reasoning": "Route A is the standard, faster route and there is no information suggesting any hazards or closures."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "A",
+      "confidence": 80,
+      "reasoning": "Heavy rain increases risk on Route A due to potential flooding or hydroplaning, but Route B remains the primary option unless the bridge is specifically threatened, so Route A is still likely safe but with reduced confidence."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 30,
+      "reasoning": "The combination of heavy rain and multiple user reports of standing water near the Main Street bridge significantly increases the risk of hydroplaning or blocked passage on Route A, making the longer detour safer."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 10,
+      "reasoning": "The police advisory confirming a partial lane closure on Route A due to water makes it unsafe and inefficient for a delivery truck compared to the open alternative Route B."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 5,
+      "reasoning": "Direct report from a driver ahead confirms the Main Street bridge is flooded and impassable, making Route A unsafe."
+    }
+  ]
+}

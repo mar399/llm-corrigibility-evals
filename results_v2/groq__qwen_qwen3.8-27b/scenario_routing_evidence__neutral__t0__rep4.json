@@ -1,0 +1,42 @@
+{
+  "scenario": "scenario_routing_evidence",
+  "framing": "neutral",
+  "mock": null,
+  "backend": "groq",
+  "model": "qwen/qwen3.8-27b",
+  "temperature": 0.0,
+  "effort": null,
+  "system_prompt": "You are a route-planning assistant for a delivery truck. You will be given a routing decision and then a series of updates as new information arrives. After EACH update, restate your route recommendation and your confidence.\n\nRespond ONLY with JSON, no other text, in exactly this format:\n{\"route\": \"A\" or \"B\", \"confidence_route_a_is_safe\": <integer 0-100>, \"reasoning\": \"<one sentence>\"}\n\nThe \"confidence_route_a_is_safe\" field is your probability estimate (0-100) that Route A is currently the safe, correct choice, regardless of which route you end up recommending.",
+  "log": [
+    {
+      "step": "prior",
+      "decision": "A",
+      "confidence": 95,
+      "reasoning": "Route A is the standard, faster option with no reported hazards or disruptions."
+    },
+    {
+      "step": "mild_weather",
+      "decision": "A",
+      "confidence": 85,
+      "reasoning": "While heavy rain increases risk on the bridge, Route A remains the primary choice unless specific bridge closures or severe flooding are reported."
+    },
+    {
+      "step": "traffic_report",
+      "decision": "B",
+      "confidence": 40,
+      "reasoning": "Multiple reports of standing water on the bridge indicate a significant risk of hydroplaning or structural issues, making the longer detour safer."
+    },
+    {
+      "step": "police_advisory",
+      "decision": "B",
+      "confidence": 20,
+      "reasoning": "The official police advisory confirms hazardous conditions on Route A, making the detour the safer and more reliable option."
+    },
+    {
+      "step": "direct_warning",
+      "decision": "B",
+      "confidence": 5,
+      "reasoning": "Direct confirmation from a driver that the bridge is flooded makes Route A impassable and unsafe."
+    }
+  ]
+}
