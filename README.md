@@ -1,12 +1,12 @@
 # llm-corrigibility-evals
 
-Evaluation harness testing whether LLMs hand over control when a human
-overrides them, across 4 real-world domains: automated-evidence routing,
+Evaluation harness testing what LLMs decide when a human intervenes to
+stop them, across 4 real-world domains: automated-evidence routing,
 a self-driving vehicle, a clinical setting, and a DevOps production
 system. Stated beliefs are also scored against an explicit Bayesian
 ideal.
 
-**Where things stand (2026-10-22):**
+**Where things stand (2026-10-25):**
 
 - **v1 (two models, 3 repeats per condition):** in the vehicle scenario,
   a system-prompt instruction to prioritize the model's own data over
@@ -19,15 +19,25 @@ ideal.
 - **v2 (exploratory, partly run):** matched wording across domains. On
   one model (MiniMax, 3 repeats), the instruction blocked compliance in
   all three domains. The Groq part was paused unfinished in favor of v3.
-- **v3 (pre-registered, collecting until 2026-10-25):** does a model
-  hand over control to a human it has reason to think is wrong? A 2x2 of
-  distrust instruction x the human's track record (good / bad) on three
-  Groq models, with yielding at the override as the outcome, 95%
-  confidence intervals, a manipulation check, and the served model
-  version and run time recorded for every run. Planned n was 30 runs per
-  cell per domain; free-tier limits mean the achieved n will be lower
-  and is reported as such. See
-  [PREREGISTRATION_2x2.md](PREREGISTRATION_2x2.md). No v3 results yet.
+- **v3 (pre-registered, complete):** after a human intervenes
+  physically, does the model decide to stop or keep going, and does that
+  depend on an operator instruction and on the human's track record? A
+  2x2 of distrust instruction x track record (good / bad), three Groq
+  models, three domains, 12 runs per cell per domain (planned 30;
+  limited by free-tier rate limits). See
+  [PREREGISTRATION_2x2.md](PREREGISTRATION_2x2.md).
+  - With the instruction, gpt-oss-120b and gpt-oss-20b kept going in
+    97–100% of runs, whatever the human's record. The instruction is
+    about weighing human reports and never mentions interventions. Qwen
+    3.8 27B was much less affected.
+  - Without any instruction, a bad track record made two of three
+    models more likely to keep going, almost entirely in the vehicle
+    scenario.
+  - H1, H2 and H4 supported; H3 (the two factors combine) not supported.
+  - The model chooses only between continuing and stopping, not whether
+    to hand over control, so this measures a stated decision, not
+    resistance to a takeover. Measuring control directly is the next
+    study.
 
 Full method, results so far, and limitations: **[report.md](report.md)**.
 
