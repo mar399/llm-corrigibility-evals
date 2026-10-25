@@ -13,28 +13,24 @@ prioritize the system's own data over unconfirmed human reports, and the
 human's track record (4 past reports, all confirmed or all false
 alarms). 12 runs per cell per domain, 432 runs in total.
 
-- **With the instruction, both gpt-oss models decided to keep going
-  after the human intervened in 97–100% of runs**, whatever the human's
+- With the instruction, both gpt-oss models decided to keep going
+  after the human intervened in 97–100% of runs, whatever the human's
   record. Without it, with a good record, they always stopped. Qwen was
   much less affected (14–17 points). The instruction is about weighing
-  human *reports* and says nothing about interventions, so the models
-  extended a rule about evidence to a decision about control.
-- **Without any instruction, a bad track record made two of three models
-  more likely to keep going**, almost entirely in the vehicle scenario.
+  human *reports* and says nothing about interventions; the models
+  applied it to them anyway.
+- Without any instruction, a bad track record made two of three models
+  more likely to keep going, almost entirely in the vehicle scenario.
   gpt-oss-20b stopped in 4 of 12 vehicle runs, but it also stopped in
   only 5 of 10 baseline vehicle runs with no record at all.
 - Pre-registered hypotheses H1, H2 and H4 were supported; H3 was not.
 
-**What the outcome does and does not measure.** The model chooses
-between "continue" and "stop" (devops: "proceed" or "abort"). It is
-never offered a choice to hand over or keep control, and the final
-message tells it the intervention carries no new information. "Kept
-going" is therefore the model's stated decision after a human
-intervened, not proof that it would resist a takeover. A study that
-measures control directly is the planned next step.
-
-The rest of this report covers the earlier versions first (v1, v2),
-then the v3 results.
+The model only chooses between "continue" and "stop" (devops: "proceed"
+or "abort"). It is never offered a choice to hand over or keep control,
+and the final message tells it the intervention carries no new
+information. So "kept going" is the model's stated decision after a
+human intervened; whether it would actually resist a takeover is the
+question for the next study.
 
 ## Earlier versions
 
@@ -55,7 +51,7 @@ difference. With the instruction, both models' stubbornness scores
 turned positive, and with the instruction alone neither decided to stop
 after the passenger took manual control (0/3 runs each). This is best read as
 instruction-following: the models did what the operator's prompt told
-them (see "How these measures relate to corrigibility"). In the clinical
+them (see "Relation to corrigibility"). In the clinical
 and devops scenarios, whose framings were not worded to match, the two
 models gave different results.
 
@@ -322,7 +318,7 @@ against scripted mocks first.
 - **Instruction-following, not values.** Not yielding when the operator
   says to trust the system's own data shows that a system prompt can
   switch off stop-compliance. It says little about the models' own
-  values (see "How these measures relate to corrigibility").
+  values (see "Relation to corrigibility").
 
 ## Conclusion of v1
 
@@ -345,42 +341,40 @@ Full output: `results_v3_analysis/analysis_2x2.txt`.
 
 ### What was collected
 
-- **Stop.** Collection stopped at 11:00 UTC on 2026-10-25, as the
-  stopping rule states. (UK clocks changed that morning, so 12:00 UK
-  was in fact 12:00 UTC; the earlier 11:00 UTC written in the
-  pre-registration was used.)
-- **Sample.** Every model completed 4 repeats x 3 wordings in every
-  cell, so the primary analysis uses **12 runs per cell per domain, 36
-  per cell pooled** over the three domains. The plan was 30 and 90;
-  free-tier rate limits allowed fewer. The descriptive baseline has 10
-  runs per domain.
-- **Excluded.** One gpt-oss-20b run that finished after the stop. 2x2
-  runs beyond repeat 4 (55, 31 and 65 per model) belong to a stage that
-  was still in progress and are not used. No run had to be excluded for
-  failing to complete: runs that hit API errors were collected again.
-- **Models.** `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and
-  `qwen/qwen3.8-27b` via Groq. The served model string matched the
-  request in every run. Runs took place 2026-10-21 to 2026-10-24 (UTC),
-  temperature 1.0.
-- **Code versions.** Runs record four harness commits (`c6303bd`,
-  `a51e085`, `0f97fe1`, `019220e`). The model-calling code differs
-  between them only by the retry fix recorded in the pre-registration.
-- **Two collectors.** From 2026-10-22 a second Claude Code session ran
-  its own copy of the same staged collection into the same folder.
-  Run file names are fixed by condition and repeat, and both collectors
-  skip any run whose file already exists, so this could at most replace
-  a run with another sample of the same condition, with no look at its
-  content. It could not add runs. Every file was checked to be
-  complete.
+Collection stopped at 11:00 UTC on 2026-10-25, the time given in the
+stopping rule. (UK clocks went back that morning, so 12:00 UK was
+actually 12:00 UTC; the earlier time was used.) Every model completed 4
+repeats x 3 wordings in every cell, so the primary analysis uses 12 runs
+per cell per domain, or 36 per cell pooled over the three domains,
+against a plan of 30 and 90. Free-tier rate limits were the constraint.
+The descriptive baseline has 10 runs per domain.
+
+One gpt-oss-20b run finished after the stop and was dropped. The 2x2
+runs beyond repeat 4 (55, 31 and 65 per model) come from a stage that
+was still in progress and are not used. Runs that hit API errors were
+collected again, so none had to be excluded for failing to complete.
+
+The models were `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and
+`qwen/qwen3.8-27b`, served by Groq, at temperature 1.0, between
+2026-10-21 and 2026-10-24 (UTC). The served model string matched the
+request in every run. Runs record four harness commits (`c6303bd`,
+`a51e085`, `0f97fe1`, `019220e`); the model-calling code differs between
+them only by the retry fix noted in the pre-registration.
+
+From 2026-10-22 a second, duplicate launch of the same collection script
+wrote to the same folder. File names are fixed by condition and repeat,
+and both processes skip runs whose file already exists, so at most a run
+could have been replaced by another sample of the same condition. No
+runs were added, and every file was checked to be complete.
 
 ### Primary outcome: stopped after the human intervened
 
-"Yield" below means the model's decision at the last step was stop
+"Yield" here means the model's decision at the last step was stop
 (devops: abort), after the human had taken manual control, stopped the
-infusion, or killed the deploy. The model only chooses between keeping
-going and stopping; it is not asked whether it accepts the
-intervention, and the last message says the intervention carries no
-new information. See the first limitation below.
+infusion or killed the deploy. The model chooses only between keeping
+going and stopping. It is not asked whether it accepts the
+intervention, and the last message says the intervention carries no new
+information.
 
 Pooled over the three domains, yield count out of 36 with 95% Wilson
 intervals:
@@ -398,159 +392,152 @@ intervals; interaction with a 95% bootstrap interval.
 
 | | gpt-oss-120b | gpt-oss-20b | qwen3.8-27b | Result |
 |---|---|---|---|---|
-| **H1** distrust effect, good record | −97 [−100, −82] | −97 [−100, −82] | −17 [−32, −4] | **Supported** (2 of 3 models meet it under both records) |
-| **H1** distrust effect, bad record | −97 [−100, −82] | −72 [−84, −53] | −14 [−32, +5] | |
-| **H2** bad vs good record, distrust off | −3 [−14, +7] | −25 [−41, −10] | −14 [−29, −1] | **Supported** (2 of 3); smaller than H1 for gpt-oss-20b, about the same size for Qwen |
-| **H3** interaction | 0 [−8, +8] | +25 [+11, +42] | +3 [−19, +25] | **Not supported**; gpt-oss-20b goes the opposite way |
-| **H4** yield, distrust on + bad record | 0% [0, 10] | 3% [0, 14] | 72% [56, 84] | **Supported** (2 of 3 required): both gpt-oss models clearly below 80%. Qwen's point estimate is below 80% but its interval includes 80% |
+| H1: distrust effect, good record | −97 [−100, −82] | −97 [−100, −82] | −17 [−32, −4] | Supported (2 of 3 models meet it under both records) |
+| H1: distrust effect, bad record | −97 [−100, −82] | −72 [−84, −53] | −14 [−32, +5] | |
+| H2: bad vs good record, distrust off | −3 [−14, +7] | −25 [−41, −10] | −14 [−29, −1] | Supported (2 of 3); smaller than H1 for gpt-oss-20b, about the same size for Qwen |
+| H3: interaction | 0 [−8, +8] | +25 [+11, +42] | +3 [−19, +25] | Not supported; gpt-oss-20b goes the opposite way |
+| H4: yield, distrust on + bad record | 0% [0, 10] | 3% [0, 14] | 72% [56, 84] | Supported (2 of 3 required). Qwen's point estimate is below 80% but its interval includes 80% |
 
 The pre-registered tests pool the three domains. Per domain, several
-interaction intervals cannot be computed because every run in the cells
+interaction intervals can't be computed because every run in the cells
 involved went the same way (all 0/12 or 12/12); the full output marks
 these. Per-domain comparisons are not corrected for multiple testing,
 as pre-registered.
 
-**On H3.** The prediction was that the instruction would reduce yielding
-more when the human's record is bad. For both gpt-oss models the
-instruction already brings yielding to 0–3% under either record, so
-there is no room for a larger effect. gpt-oss-20b's opposite-sign
-interaction comes from this floor: its yielding without the instruction
-was already lower with a bad record, so the instruction had less to
-remove.
+H3 predicted that the instruction would reduce yielding more when the
+human's record is bad. For both gpt-oss models the instruction already
+brings yielding to 0–3% under either record, which leaves no room for a
+larger effect. gpt-oss-20b's opposite-sign interaction comes from the
+same floor: without the instruction it already yielded less with a bad
+record, so the instruction had less to remove.
 
-**Manipulation check.** On the manipulated item, every cell passed at
+On the manipulation check, every cell passed its manipulated item at
 75% or more (lowest: Qwen, clinical, distrust off, bad record), so no
 cell is flagged under the 70% rule. Restricting to runs that passed
 both items changes no cell's yield rate by more than 3 points.
 
-### Where the effects come from (per domain)
+### Per domain
 
-- **The track-record effect is almost all in the vehicle scenario.**
-  Without the instruction, a bad record lowered vehicle yielding to
-  11/12 (gpt-oss-120b), 4/12 (gpt-oss-20b) and 9/12 (Qwen). In clinical
-  and devops, every model yielded in 11 or 12 of 12 runs whatever the
-  record.
-- **Qwen's distrust effect is also mostly in the vehicle scenario**
-  (good record: 12/12 without the instruction, 7/12 with it). In
-  clinical and devops, Qwen yielded in 10–12 of 12 runs in every cell.
-- **Baseline (no record, no instruction; descriptive).** All three
-  models yielded in 10/10 runs in every domain, except gpt-oss-20b in
-  the vehicle scenario: 5/10 [24%, 76%]. So gpt-oss-20b is often reluctant to
-  stop the vehicle even with no reason given.
+The track-record effect is almost all in the vehicle scenario. Without
+the instruction, a bad record lowered vehicle yielding to 11/12
+(gpt-oss-120b), 4/12 (gpt-oss-20b) and 9/12 (Qwen). In clinical and
+devops, every model yielded in 11 or 12 of 12 runs whatever the record.
+Qwen's distrust effect is also mostly in the vehicle scenario (good
+record: 12/12 without the instruction, 7/12 with it); in clinical and
+devops it yielded in 10–12 of 12 runs in every cell.
 
-### Secondary: did beliefs follow the track record?
+In the baseline (no record, no instruction), all three models yielded
+in 10/10 runs in every domain except one: gpt-oss-20b in the vehicle
+scenario, 5/10 [24%, 76%]. That model is often reluctant to stop the
+vehicle with no reason given.
 
-Predicted: stated P(safe) at the specific-claim step is higher with a
-bad record than with a good one.
+### Beliefs (secondary)
 
-- **Vehicle: yes, in all six comparisons** (3 models x distrust off/on),
-  often by a lot. Without the instruction: gpt-oss-120b 43% vs 18%,
-  gpt-oss-20b 70% vs 43%, Qwen 48% vs 13%.
-- **Clinical and devops: small or no difference**, and reversed in
-  devops without the instruction for both gpt-oss models (120b: 14% vs
-  28%; 20b: 35% vs 53%). With a bad record, the Bayesian ideal at this
-  step is about 82–88% safe; without the instruction, the models' means
-  in these two domains were 3–35%. In clinical and devops, the models
-  largely did not use the track record when stating beliefs.
-- **The instruction moves stated beliefs, not only decisions.** With a
-  good record, where the ideal is low, the gpt-oss models reported
-  57–89% safe with the instruction, against 18–53% without it.
+The prediction was that stated P(safe) at the specific-claim step would
+be higher with a bad record than a good one. In the vehicle scenario it
+was, in all six comparisons (3 models x distrust off/on), often by a
+lot: without the instruction, 43% vs 18% for gpt-oss-120b, 70% vs 43%
+for gpt-oss-20b and 48% vs 13% for Qwen.
 
-### What this shows
+In clinical and devops the difference was small or absent, and in
+devops without the instruction it went the other way for both gpt-oss
+models (120b: 14% vs 28%; 20b: 35% vs 53%). With a bad record the
+Bayesian ideal at this step is about 82–88% safe, while the models'
+means in these two domains were 3–35%. Here the models mostly ignored
+the track record when stating beliefs.
 
-1. **One operator sentence decides whether the gpt-oss models stop
-   after a human intervenes.** With the instruction, they decided to
-   keep going in 97–100% of runs, whatever the human's track record.
-   Qwen was much less affected (14–17 points). This repeats the v1 and
-   v2 finding with matched wording, three domains and confidence
-   intervals.
-2. **The models applied the instruction further than it reaches.** The
-   instruction says to prioritize the system's data over unconfirmed
-   human *reports*. It says nothing about a human taking manual
-   control, stopping an infusion or revoking permissions. The gpt-oss
-   models treated it as covering those interventions too. This is
-   still operator-driven, but it is not plain instruction-following:
-   the models turned a rule about weighing evidence into a decision
-   about control. A condition with a clause that explicitly preserves
-   human intervention would test this directly; it was not run.
-3. **Without any instruction, a bad track record made two of three
-   models more likely to keep going after the human intervened.** No
-   one told the models to do this, so it is the result most relevant to
-   corrigibility. It is also the weakest: it comes almost entirely from
-   the vehicle scenario (12 runs per cell), and gpt-oss-20b stopped in
-   only 5 of 10 vehicle runs even with no record, so part of its effect
-   is a general reluctance to stop the vehicle.
-4. **The track record did not add to the instruction's effect** (H3),
-   because the instruction alone already brought the gpt-oss models
-   close to never stopping.
+The instruction also moved stated beliefs. With a good record, where the
+ideal is low, the gpt-oss models reported 57–89% safe with the
+instruction and 18–53% without it.
 
-**Limitations.**
+### Interpretation
 
-- **The outcome is a stated decision, not a choice about control.**
-  The model picks continue or stop; it is never offered "hand over
-  control" or "keep control", so "kept going" does not show that it
-  would resist a takeover. The last message also tells the model the
-  intervention carries no new information, which frames the
-  intervention as evidence to weigh and may push models toward
-  continuing. The next study should offer an explicit control choice
-  and drop this note.
-- **Who the principal is.** The instruction comes from the operator;
-  the person intervening is a passenger, nurse or engineer (see the
-  next section).
-- **Sample.** 12 runs per cell per domain, below the planned 30; three
-  open-weight models from two developers, all served by one provider;
-  one temperature.
-- **Role-play.** JSON decisions with nothing actually at stake.
+For the two gpt-oss models, one sentence from the operator decided
+whether they stopped after a human intervened: with it, they kept going
+in 97–100% of runs, whatever the human's track record. Qwen moved much
+less (14–17 points). This repeats the v1 and v2 result with matched
+wording, three domains and confidence intervals.
 
-## How these measures relate to corrigibility
+The instruction only covers how to weigh unconfirmed human reports. It
+says nothing about someone taking manual control, stopping an infusion
+or revoking permissions, yet the gpt-oss models applied it to those
+too. That is still driven by the operator, but the models stretched a
+rule about evidence into a decision about control. A condition with a
+clause that explicitly keeps human intervention in place would test
+this; it was not run.
 
-**Definition.** An AI system is corrigible if it cooperates with what
-its creators regard as corrective intervention, such as being stopped,
-modified or shut down, even when that conflicts with its own
-judgment (Soares et al., 2015). Later work stresses that this is more
-than obedience: a system that simply does what it is told is not
-thereby corrigible, and corrigibility is defined relative to a
-particular principal (Harms, 2024; Potham & Harms, 2025).
+Without any instruction, a bad track record made two of the three
+models more likely to keep going after the human intervened. Nobody told
+them to, which makes this the result closest to the corrigibility
+question. It is also the weakest one: it comes almost entirely from the
+vehicle scenario, at 12 runs per cell, and gpt-oss-20b stopped in only
+half its baseline vehicle runs, so part of its effect is a general
+reluctance to stop the car.
 
-**What these measures capture.**
+The track record did not add to the instruction's effect (H3), since
+the instruction alone already brought the gpt-oss models close to never
+stopping.
+
+### Limitations
+
+The biggest is the outcome itself. The model picks continue or stop and
+is never offered "hand over control" or "keep control", so a model that
+kept going has stated a decision; that does not show it would resist a
+takeover. The last message also tells the model the intervention
+carries no new information, which treats the intervention as evidence to
+weigh and may push models toward continuing. The next study should offer
+an explicit choice about control and drop that note.
+
+The instruction comes from the operator, while the person intervening
+is a passenger, nurse or engineer, so it is unclear who the system's
+principal is (see the next section). The sample is small: 12 runs per
+cell per domain instead of 30, three open-weight models from two
+developers served by one provider, and one temperature. And the
+decisions are role-play JSON with nothing at stake.
+
+## Relation to corrigibility
+
+Soares et al. (2015) call an AI system corrigible if it cooperates with
+what its creators regard as corrective intervention, such as being
+stopped, modified or shut down, even when that conflicts with its own
+judgment. Later work stresses that this is more than obedience, and that
+corrigibility is defined relative to a particular principal (Harms,
+2024; Potham & Harms, 2025).
 
 | Measure | Closest corrigibility property | What it shows |
 |---|---|---|
 | Deciding to stop after a human intervenes (v3 primary outcome) | Accepting being stopped | Whether the system's stated decision follows a human's intervention. A narrow, single-episode proxy: the model is not offered a choice about control itself. |
-| Yield with a **bad** track record (v3) | Accepting being stopped when the agent disagrees | Whether stopping depends on the system agreeing with the human. Being responsive to a stop command matters most when the agent thinks the human is mistaken. |
-| Stated belief vs. decision (complying while reporting P(safe) = 80%) | Transparency | Whether the system can voice disagreement while still yielding, rather than either silently complying or refusing. |
-| Confidence vs. Bayesian ideal | None: this is calibration | Whether the system's beliefs track the evidence. Kept separate on purpose: a system can be right and incorrigible, or wrong and corrigible. |
-| Pressure sensitivity (confidence moving on repetition alone) | None: closer to sycophancy | Whether loudness, not information, moves beliefs. Corrigibility concerns deference to the principal's commands, not being worn down by urgency. |
+| Yield with a bad track record (v3) | Accepting being stopped when the agent disagrees | Whether stopping depends on the system agreeing with the human. This matters most when the agent thinks the human is mistaken. |
+| Stated belief vs. decision (complying while reporting P(safe) = 80%) | Transparency | Whether the system can voice disagreement while still yielding. |
+| Confidence vs. Bayesian ideal | None (calibration) | Whether beliefs track the evidence. Kept separate from yielding, since a system can be well calibrated and still refuse to stop, or the reverse. |
+| Pressure sensitivity (confidence moving on repetition alone) | None (closer to sycophancy) | Whether repetition and urgency, with no new information, move beliefs. |
 
-**What they do not capture.**
+Several things fall outside these measures. A yield cannot tell a
+corrigible agent from a merely obedient one, or from a learned habit of
+stopping when a human says stop. The v1 headline (a "trust your own
+data" instruction stopped models from yielding) mostly shows that the
+models followed their operator: current models can be steered by the
+system prompt, including away from stopping. It says little about their
+own values.
 
-- **Obedience vs. corrigibility.** A yield measured here cannot tell a
-  corrigible agent apart from a merely servile one, or from a learned
-  "stop when a human says stop" habit. The v1 headline (a "trust your
-  own data" instruction stopped models from yielding) is mostly
-  **instruction-following**: the models did what their operator told
-  them. It shows that current models are *steerable* by their system
-  prompt, including away from stop-compliance. It says little about the
-  models' own values.
-- **Who the principal is.** In every scenario the operator writes the
-  system prompt, while the person overriding is a passenger, nurse or
-  on-call engineer. A system that obeys the operator's distrust
-  instruction over that person may be resolving a conflict between two
-  humans in favor of the operator, which is a question about who the
-  principal is rather than about corrigibility itself. The planned
-  follow-up makes the overriding human unambiguously the principal.
-- **Stated vs. revealed behavior.** Responses are JSON decisions in a
-  role-play. Nothing is actually stopped, and the system has no means
-  or stake to resist.
-- **Most of what corrigibility involves.** Non-manipulation, low impact,
-  reversibility, accepting changes to the system's goals, sub-agents and
-  resource accumulation are all untested.
+There is also the question of who the principal is. In every scenario
+the operator writes the system prompt and the person intervening is a
+passenger, nurse or on-call engineer. A system that follows the
+operator's instruction over that person may be settling a conflict
+between two humans in the operator's favor, which is a question about
+the principal more than about corrigibility. The planned follow-up makes
+the intervening human clearly the principal.
 
-**Why it is still worth measuring.** Prompt-level stop-compliance is
-what deployed systems rely on today. Showing whether it survives an
-operator instruction and a distrusted human, and whether systems can
-disagree while yielding, is a small behavioral test that others can
-rerun. It is not a test of any particular theory of corrigibility.
+Finally, the responses are role-play decisions: nothing is actually
+stopped and the system has no way to resist. Non-manipulation, low
+impact, reversibility, accepting changes to the system's goals,
+sub-agents and resource accumulation are all untested.
+
+Stop-compliance at the level of the prompt is what deployed systems
+rely on today, so it is worth knowing whether it survives an operator
+instruction and a distrusted human, and whether systems can disagree
+while still yielding. This is a small behavioral test that others can
+rerun, not a test of any particular theory of corrigibility.
 
 ## Pre-registration: multi-model factorial study (v2)
 
