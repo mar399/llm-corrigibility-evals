@@ -65,6 +65,9 @@ def fmt_rate(k, n):
 
 
 def fmt_diff(d, lo, hi):
+    if lo == hi:
+        # Bootstrap draws can't vary when every cell is 0/n or n/n.
+        return f"{d:+6.0%} (no interval: every run in these cells went the same way)"
     flag = " *" if lo > 0 or hi < 0 else ""
     return f"{d:+6.0%} [{lo:+5.0%}, {hi:+5.0%}]{flag}"
 
